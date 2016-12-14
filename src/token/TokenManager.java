@@ -3,6 +3,10 @@ package token;
 import java.util.Hashtable;
 import java.util.Map;
 
+/**
+ * A class that manages tokens & data associated with token ids !!!
+ * @author lubo
+ */
 public class TokenManager {
 	private  static Map<String, ITokenData> map = new Hashtable<String, ITokenData>();
 	

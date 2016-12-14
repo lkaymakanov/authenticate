@@ -2,7 +2,7 @@ package token;
 
 
 
-public class TokenData implements ITokenData{
+class TokenData implements ITokenData{
 	/**
 	 * 
 	 */
