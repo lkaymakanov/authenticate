@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author lubo
  *
  */
-public interface ITokenData extends Serializable{
+public interface ITokenData<T> extends Serializable{
 	/***
 	 * The unique id of the token!!!
 	 * @return
@@ -31,4 +31,10 @@ public interface ITokenData extends Serializable{
 	 * @return
 	 */
 	public String getRequestIp();
+	
+	/**
+	 * Additional data set to Token!!!
+	 * @return
+	 */
+	public T getAdditionalData();
 }

@@ -2,7 +2,7 @@ package token;
 
 
 
-class TokenData implements ITokenData{
+public class TokenData<T> implements ITokenData<T>{
 	/**
 	 * 
 	 */
@@ -11,39 +11,48 @@ class TokenData implements ITokenData{
 	private String tokenSessionId;
 	private String userId;
 	private String requestIp;
+	private T data;
 	
-	private TokenData(String tokenId, String tokenSessionid, String userId, String requestIp){
+	private TokenData(String tokenId, String tokenSessionid, String userId, String requestIp, T data){
 		this.tokenId = tokenId;
 		this.tokenSessionId = tokenSessionid;
 		this.userId = userId;
 		this.requestIp = requestIp;
+		this.data = data;
 	}
 	
-	public static class TokenBuilder{
+	public static class TokenBuilder<T>{
 		private String tokenId;
 		private String tokenSessionId;
 		private String userId;
 		private String requestIp;
+		private T data;
 		
-		public TokenBuilder setTokenId(String tokenId) {
+		public TokenBuilder<T> setTokenId(String tokenId) {
 			this.tokenId = tokenId;
 			return this;
 		}
-		public TokenBuilder setTokenSessionId(String tokenSessionId) {
+		public TokenBuilder<T> setTokenSessionId(String tokenSessionId) {
 			this.tokenSessionId = tokenSessionId;
 			return this;
 		}
-		public TokenBuilder setUserId(String userId) {
+		public TokenBuilder<T> setUserId(String userId) {
 			this.userId = userId;
 			return this;
 		}
-		public TokenBuilder setRequestIp(String requestIp) {
+		public TokenBuilder<T> setRequestIp(String requestIp) {
 			this.requestIp = requestIp;
 			return this;
 		}
 		
-		public ITokenData build(){
-		    return new TokenData(tokenId, tokenSessionId, userId, requestIp);
+		public TokenBuilder<T> setAdditionalData(T data){
+			this.data = data;
+			return this;
+		}
+		
+		public ITokenData<T> build(){
+			TokenData<T> d =  new TokenData<T>(tokenId, tokenSessionId, userId, requestIp, data);
+			return d;
 		}
 	}
 	
@@ -63,4 +72,8 @@ class TokenData implements ITokenData{
 		return requestIp;
 	}
 	
+	public T getAdditionalData() {
+		// TODO Auto-generated method stub
+		return data;
+	}
 }
