@@ -1,5 +1,9 @@
 package authenticate;
 
+/**
+ * Authentication exception thrown on unsuccessful authentication !!!
+ * @author lubo
+ */
 public class AuthenticationException extends Exception {
 	/**
 	 * 
