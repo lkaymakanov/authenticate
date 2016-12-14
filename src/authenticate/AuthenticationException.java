@@ -16,8 +16,9 @@ public class AuthenticationException extends Exception {
 		super();
 	}
 	
-	private AuthenticationException(String message, Throwable t){
+	private AuthenticationException(String message, Throwable t, Object data){
 		super(message, t);
+		this.data = data;
 	}
 	
 	private AuthenticationException(String message){
@@ -51,7 +52,7 @@ public class AuthenticationException extends Exception {
 		}
 		
 		public AuthenticationException build(){
-			return t == null  ? new AuthenticationException(message) : new AuthenticationException(message, t); 
+			return t == null  ? new AuthenticationException(message) : new AuthenticationException(message, t, data); 
 		}
 	}
 	
