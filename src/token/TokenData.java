@@ -1,9 +1,8 @@
-package authenticate;
-
-import java.io.Serializable;
+package token;
 
 
-public class TokenData implements Serializable{
+
+public class TokenData implements ITokenData{
 	/**
 	 * 
 	 */
@@ -43,12 +42,9 @@ public class TokenData implements Serializable{
 			return this;
 		}
 		
-		
-		public TokenData build(){
-		  return new TokenData(tokenId, tokenSessionId, userId, requestIp);
+		public ITokenData build(){
+		    return new TokenData(tokenId, tokenSessionId, userId, requestIp);
 		}
-		
-		
 	}
 	
 	public String getTokenId() {
