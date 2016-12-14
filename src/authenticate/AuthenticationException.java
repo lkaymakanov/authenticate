@@ -9,17 +9,51 @@ public class AuthenticationException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 386962401523854871L;
-	public AuthenticationException() {
+	private Object data;
+	
+	private AuthenticationException() {
 		// TODO Auto-generated constructor stub
 		super();
 	}
 	
-	public AuthenticationException(String message, Throwable t){
+	private AuthenticationException(String message, Throwable t){
 		super(message, t);
 	}
 	
-	public AuthenticationException(String message){
+	private AuthenticationException(String message){
 		super(message);
 	}
+	
+	
+	public <T> T getData() {
+		return (T) data;
+	}
+
+
+	public static class AuthenticationExceptionBuilder<T>{
+		private  String message; 
+		private  Throwable t;
+		private  T data;
+
+		public AuthenticationExceptionBuilder<T> setMessage(String message) {
+			this.message = message;
+			return this;
+		}
+
+		public AuthenticationExceptionBuilder<T> setData(T data) {
+			this.data = data;
+			return this;
+		}
+
+		public AuthenticationExceptionBuilder<T> setT(Throwable t) {
+			this.t = t;
+			return this;
+		}
+		
+		public AuthenticationException build(){
+			return t == null  ? new AuthenticationException(message) : new AuthenticationException(message, t); 
+		}
+	}
+	
 	
 }
