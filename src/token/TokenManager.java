@@ -16,6 +16,7 @@ public class TokenManager {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static ITokenData getTokeData(String tokenId){
 		synchronized (TokenManager.class) {
 			return map.get(tokenId);
