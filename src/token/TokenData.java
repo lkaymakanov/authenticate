@@ -21,31 +21,31 @@ public class TokenData<T> implements ITokenData<T>{
 		this.data = data;
 	}
 	
-	public static class TokenBuilder<T>{
+	public static class TokenDataBuilder<T>{
 		private String tokenId;
 		private String tokenSessionId;
 		private String userId;
 		private String requestIp;
 		private T data;
 		
-		public TokenBuilder<T> setTokenId(String tokenId) {
+		public TokenDataBuilder<T> setTokenId(String tokenId) {
 			this.tokenId = tokenId;
 			return this;
 		}
-		public TokenBuilder<T> setTokenSessionId(String tokenSessionId) {
+		public TokenDataBuilder<T> setTokenSessionId(String tokenSessionId) {
 			this.tokenSessionId = tokenSessionId;
 			return this;
 		}
-		public TokenBuilder<T> setUserId(String userId) {
+		public TokenDataBuilder<T> setUserId(String userId) {
 			this.userId = userId;
 			return this;
 		}
-		public TokenBuilder<T> setRequestIp(String requestIp) {
+		public TokenDataBuilder<T> setRequestIp(String requestIp) {
 			this.requestIp = requestIp;
 			return this;
 		}
 		
-		public TokenBuilder<T> setAdditionalData(T data){
+		public TokenDataBuilder<T> setAdditionalData(T data){
 			this.data = data;
 			return this;
 		}

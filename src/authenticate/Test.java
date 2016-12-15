@@ -1,12 +1,12 @@
 package authenticate;
 
 import token.ITokenData;
-import token.TokenData.TokenBuilder;
+import token.TokenData.TokenDataBuilder;
 
 public class Test {
 
 	public static void main(String [] ar){
-		TokenBuilder<String> s  = new TokenBuilder<String>();
+		TokenDataBuilder<String> s  = new TokenDataBuilder<String>();
 		s.setAdditionalData("add");
 		s.setTokenId("tokenId");
 		ITokenData<String> tdata =  s.build();

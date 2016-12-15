@@ -19,10 +19,10 @@ public final class SharedToken implements IToken{
 	private long ttl;
 	
 	private SharedToken(){
-		this(0);
+		this(null, 0);
 	}
 	
-	private SharedToken(long ttl){
+	private SharedToken(String id, long ttl){
 		id = TokenUtils.generateTokenId();
 		this.createTimeDate = new Date();
 		this.ttl = ttl;
@@ -42,12 +42,16 @@ public final class SharedToken implements IToken{
 		return id;
 	}
 	
-	static SharedToken getInstance(){
-		return new SharedToken(0);
+	public static SharedToken getInstance(String id){
+		return new SharedToken(id, 0);
+	}
+	
+	public static SharedToken getInstance(String id, long ttl){
+		return new SharedToken(id, ttl);
 	}
 	
 	public static SharedToken getInstance(long ttl){
-		return new SharedToken(ttl);
+		return new SharedToken(null, ttl);
 	}
 
 
