@@ -8,7 +8,6 @@ public class TokenDataUserData {
 	private String defDbCon;
 	private ITokenData tokenData;
 	
-	
 	public String getUserKey() {
 		return userKey;
 	}

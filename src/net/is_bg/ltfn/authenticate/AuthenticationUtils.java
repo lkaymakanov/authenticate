@@ -1,5 +1,7 @@
 package net.is_bg.ltfn.authenticate;
 
+import java.util.Map;
+
 import token.ITokenData;
 import token.TokenData.TokenDataBuilder;
 import token.TokenUtils;
@@ -57,7 +59,34 @@ public class AuthenticationUtils {
 		return tokenDataBuilder.build();
     }
     
+    /***
+     * Get Token authentication 
+     * @param httpsesionParamMap
+     * @param getTokenDataCallBack
+     * @param getIpAddressCallBack
+     * @param autenticationCallBack
+     * @param checkifUserLoggedCallBack
+     * @return
+     */
+    public static IAuthentication getTokenAuthentication(Map httpsesionParamMap,
+			IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
+			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+			IAuthenticationCallBack<Object, String> autenticationCallBack,
+			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
+			IAuthenticationCallBack<Object, Object> userLoggedCallBack,
+			Object userLogParam){
+    	return new TokenAuthenticationFactory(httpsesionParamMap, getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
+    			,userLoggedCallBack, userLogParam).getAuthentication();
+    }
     
+    
+    /**
+     * Check if token is valid!!!
+     * @param callBack
+     * @param tokenId
+     * @return
+     * @throws Exception
+     */
     public static Boolean isTokenValid(IAuthenticationCallBack<Boolean, String> callBack, String tokenId) throws Exception{
     	return TokenAuthenticationFactory.isTokenValid(callBack, tokenId);
     }

@@ -41,13 +41,18 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		String tokenId = getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : getRequestParam(httpsesionParamMap,
 				TokenConstants.TOKEN_ID_PARAM_NAME);
 		System.out.println("TOKEN_ID:" +  tokenId);
-		//System.out.println("USER_ID: " +  getRequestParam(httpsesionParamMap, TokenConstants.USER_ID_PARAM_NAME));
 		return new TokenCredentials(new Token(tokenId));
 	}
 	
-	public TokenAuthenticationFactory(Map httpsesionParamMap){
+	TokenAuthenticationFactory(Map httpsesionParamMap,
+			IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
+			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+			IAuthenticationCallBack<Object, String> autenticationCallBack,
+			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
+			IAuthenticationCallBack<Object, Object> userLogcallBack,
+			Object callBackParam){
 		this.httpsesionParamMap = httpsesionParamMap;
-		tokenAuthentication = new TokenAuthenticationInner(getTokenCredentials());
+		tokenAuthentication = new TokenAuthenticationInner(getTokenCredentials(), getTokenDataCallBack, getIpAddressCallBack,autenticationCallBack, checkifUserLoggedCallBack, userLogcallBack, callBackParam);
 	}
 	
 	@Override
@@ -239,15 +244,23 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		IAuthenticationCallBack<String,Object> getIpAddressCallBack;
 		IAuthenticationCallBack<Object, String> autenticationCallBack;
 		IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
+		IAuthenticationCallBack<Object, Object> logUserCallBack;
+		Object logUserCallBackParam;
 		
-		public TokenAuthenticationInner(TokenCredentials tokenCredentials) {
+		public TokenAuthenticationInner(TokenCredentials tokenCredentials, 
+				IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
+				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+				IAuthenticationCallBack<Object, String> autenticationCallBack,
+				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
+				IAuthenticationCallBack<Object, Object> logUserCallBack, Object logUserCallBackParam) {
 			super(tokenCredentials);
+			this.getTokenDataCallBack = getTokenDataCallBack;
+			this.getIpAddressCallBack = getIpAddressCallBack;
+			this.autenticationCallBack = autenticationCallBack;
+			this.checkifUserLoggedCallBack = checkifUserLoggedCallBack;
+			this.logUserCallBack = logUserCallBack;
+			this.logUserCallBackParam = logUserCallBackParam;
 		}
-		
-		/*private User getUserByUserKey(String userKey){
-			return AppUtil.getServiceLocator().getUserDao().getUserByUserKey(userKey, ConnectionLoader.getConnectionLoader().getMapConnection().get(0).defDbCon);
-		}*/
-		
 		
 
 		@Override
@@ -326,8 +339,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}
 			
 			//log user
+			logUserCallBack.callBack(logUserCallBackParam);
 			//AuthenticationUtils.logUser(httpServletRequest, getUserByUserKey(tdata.userKey), tokenId, 0);
-			
 			
 			return true;
 		}
