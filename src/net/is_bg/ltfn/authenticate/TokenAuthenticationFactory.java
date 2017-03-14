@@ -20,14 +20,13 @@ import authenticate.TokenCredentials;
 class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 
 	private IAuthentication<Boolean> tokenAuthentication;
-	private Map httpsessionParamMap;
 	
 	/**
 	 * Get parameter by name from request
 	 * @param paramName
 	 * @return
 	 */
-	private  String  getRequestParam(Map httpsesionParamMap, String paramName){
+	private static String  getRequestParam(Map httpsesionParamMap, String paramName){
 		String [] p = ((Map<String, String[]>)(httpsesionParamMap)).get(paramName);
 		if(p==null || p.length == 0) return null;  
 		return p[0];
@@ -37,9 +36,9 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * Get token from request!!!
 	 * @return
 	 */
-	private TokenCredentials getTokenCredentials(){
-		String tokenId = getRequestParam(httpsessionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : 
-			getRequestParam(httpsessionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
+	private static TokenCredentials getTokenCredentials(Map httpsesionParamMap){
+		String tokenId = getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : 
+			getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
 		System.out.println("TOKEN_ID:" +  tokenId);
 		return new TokenCredentials(new Token(tokenId));
 	}
@@ -52,9 +51,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 			IAuthenticationCallBack<Object, Object> userLogcallBack,
 			Object callBackParam){
-		this.httpsessionParamMap = httpsessionParamMap;
 		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
-				getTokenCredentials(), 
+				getTokenCredentials(httpsessionParamMap), 
 				getTokenDataCallBack, 
 				getIpAddressCallBack,
 				autenticationCallBack, 
@@ -93,40 +91,35 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	}
 	
 	
-	/**
-	 * The structure of data that is coming from Authentication server!!!
-	 * @author lubo
-	 *
-	 */
 	static class ServerData {
 		private TokenDataWrapper tokenData;
 		private String userKey;
 		private String defDbCon;
-		public ServerData(TokenDataWrapper tokenData, String userKey, String defDbCon) {
+		ServerData(TokenDataWrapper tokenData, String userKey, String defDbCon) {
 			super();
 			this.tokenData = tokenData;
 			this.userKey = userKey;
 			this.defDbCon = defDbCon;
 		}
-		public ServerData() {
+		ServerData() {
 			// TODO Auto-generated constructor stub
 		}
-		public TokenDataWrapper getTokenData() {
+		TokenDataWrapper getTokenData() {
 			return tokenData;
 		}
-		public void setTokenData(TokenDataWrapper tokenData) {
+		void setTokenData(TokenDataWrapper tokenData) {
 			this.tokenData = tokenData;
 		}
-		public String getUserKey() {
+		String getUserKey() {
 			return userKey;
 		}
-		public void setUserKey(String userKey) {
+		void setUserKey(String userKey) {
 			this.userKey = userKey;
 		}
-		public String getDefDbCon() {
+		String getDefDbCon() {
 			return defDbCon;
 		}
-		public void setDefDbCon(String defDbCon) {
+		void setDefDbCon(String defDbCon) {
 			this.defDbCon = defDbCon;
 		}
 		
@@ -214,8 +207,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * @return
 	 * @throws Exception
 	 */
-	private static ServerData  getTokenDataFromAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
-		return  (ServerData)autenticationCallBack.callBack(tokenId);
+	private static ServerDataEx  getTokenDataFromAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
+		return (ServerDataEx)autenticationCallBack.callBack(tokenId);
 	}
 	
 	
@@ -263,7 +256,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			//get token id from request
 			String tokenId = getTokentCredentials().getToken().getTokenId();
 			
-			
 			//check if user is logged
 			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
 				return true;
@@ -290,7 +282,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}
 			
 			//retrieve tokenData from authentication server
-			ServerData tdata = null;
+			ServerDataEx tdata = null;
 			ITokenData tokenData = null;
 			try {
 				

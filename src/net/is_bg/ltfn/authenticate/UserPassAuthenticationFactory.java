@@ -11,7 +11,7 @@ import authenticate.UserPassAuthentication;
  * @author lubo
  *
  */
-public class UserPassAuthenticationFactory implements IAuthenticationFactory {
+class UserPassAuthenticationFactory implements IAuthenticationFactory {
 
     private UserPassAuthentication up;
 

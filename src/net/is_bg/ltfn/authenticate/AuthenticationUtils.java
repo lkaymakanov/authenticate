@@ -3,7 +3,6 @@ package net.is_bg.ltfn.authenticate;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.ServerData;
 import token.ITokenData;
 import token.TokenData.TokenDataBuilder;
 import token.TokenUtils;
@@ -70,15 +69,15 @@ public class AuthenticationUtils {
 
     
     public static String getUserKeyFromServerData(Object sdata){
-    	return ((ServerData)sdata).getUserKey();
+    	return ((ServerDataEx)sdata).getUserKey();
     }
   
     public static String getConnectionNameFromServerData(Object sdata){
-    	return ((ServerData)sdata).getDefDbCon();
+    	return ((ServerDataEx)sdata).getDefDbCon();
     }
     
     public static Object getTokenDataAdditionalData(Object sdata){
-    	return ((ServerData)sdata).getTokenData().getAdditionalData();
+    	return ((ServerDataEx)sdata).getTokenData().getAdditionalData();
     }
     
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 
