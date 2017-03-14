@@ -1,7 +1,9 @@
 package net.is_bg.ltfn.authenticate;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.ServerData;
 import token.ITokenData;
 import token.TokenData.TokenDataBuilder;
 import token.TokenUtils;
@@ -16,6 +18,41 @@ import authenticate.IAuthentication;
 public class AuthenticationUtils {
 	
 
+	private static Map<String, String> tokenIdSessionIdMap = new HashMap<String, String>();
+	
+	/***
+	 * Associates token id & session Id!!!
+	 * @param tokenId
+	 * @param sessionId
+	 */
+	public static void addTokenIdSessionId(String tokenId, String sessionId){
+		synchronized(tokenIdSessionIdMap){
+			tokenIdSessionIdMap.put(tokenId, sessionId);
+		}
+	}
+	
+	/***
+	 * Returns the session associated with this token if any!!!
+	 * @param tokenId
+	 * @return
+	 */
+	public static String getSessionAssociatedWithToken(String tokenId){
+		synchronized(tokenIdSessionIdMap){
+			return tokenIdSessionIdMap.get(tokenId);
+		}
+	}
+	
+	/***
+	 * Removes token from tokenIdSessionIdMap
+	 * @param tokenId
+	 */
+	public static void invalidateTokenId(String tokenId){
+		if(tokenId  == null) return ;
+		synchronized(tokenIdSessionIdMap){
+			String sessionId = tokenIdSessionIdMap.get(tokenId);
+			tokenIdSessionIdMap.remove(sessionId);
+		}
+	}
 
     /**
      * Gets a user password based authentication!!!
@@ -31,7 +68,18 @@ public class AuthenticationUtils {
     }
 
 
+    
+    public static String getUserKeyFromServerData(Object sdata){
+    	return ((ServerData)sdata).getUserKey();
+    }
   
+    public static String getConnectionNameFromServerData(Object sdata){
+    	return ((ServerData)sdata).getDefDbCon();
+    }
+    
+    public static Object getTokenDataAdditionalData(Object sdata){
+    	return ((ServerData)sdata).getTokenData().getAdditionalData();
+    }
     
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 
     					  String userKey, IAuthenticationCallBack<String, String> callBack, String callBackParam
@@ -69,13 +117,15 @@ public class AuthenticationUtils {
      * @return
      */
     public static IAuthentication getTokenAuthentication(Map httpsesionParamMap,
-			IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
-			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+    		Object httpServletRequest,
+			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
+			IAuthenticationCallBack<String, Object> getIpAddressCallBack,
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 			IAuthenticationCallBack<Object, Object> userLoggedCallBack,
 			Object userLogParam){
-    	return new TokenAuthenticationFactory(httpsesionParamMap, getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
+    	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,
+    			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
     			,userLoggedCallBack, userLogParam).getAuthentication();
     }
     

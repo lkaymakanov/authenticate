@@ -20,7 +20,7 @@ import authenticate.TokenCredentials;
 class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 
 	private IAuthentication<Boolean> tokenAuthentication;
-	private Map httpsesionParamMap;
+	private Map httpsessionParamMap;
 	
 	/**
 	 * Get parameter by name from request
@@ -38,21 +38,29 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * @return
 	 */
 	private TokenCredentials getTokenCredentials(){
-		String tokenId = getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : getRequestParam(httpsesionParamMap,
-				TokenConstants.TOKEN_ID_PARAM_NAME);
+		String tokenId = getRequestParam(httpsessionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : 
+			getRequestParam(httpsessionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
 		System.out.println("TOKEN_ID:" +  tokenId);
 		return new TokenCredentials(new Token(tokenId));
 	}
 	
-	TokenAuthenticationFactory(Map httpsesionParamMap,
-			IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
+	TokenAuthenticationFactory(Map httpsessionParamMap,
+			Object httpServletRequest,
+			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
 			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 			IAuthenticationCallBack<Object, Object> userLogcallBack,
 			Object callBackParam){
-		this.httpsesionParamMap = httpsesionParamMap;
-		tokenAuthentication = new TokenAuthenticationInner(getTokenCredentials(), getTokenDataCallBack, getIpAddressCallBack,autenticationCallBack, checkifUserLoggedCallBack, userLogcallBack, callBackParam);
+		this.httpsessionParamMap = httpsessionParamMap;
+		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
+				getTokenCredentials(), 
+				getTokenDataCallBack, 
+				getIpAddressCallBack,
+				autenticationCallBack, 
+				checkifUserLoggedCallBack, 
+				userLogcallBack, 
+				callBackParam);
 	}
 	
 	@Override
@@ -90,7 +98,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * @author lubo
 	 *
 	 */
-	private static class ServerData{
+	static class ServerData {
 		private TokenDataWrapper tokenData;
 		private String userKey;
 		private String defDbCon;
@@ -124,7 +132,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		
 	}
 	
-	private static class TokenDataWrapper<T> implements ITokenData<T>{
+	static class TokenDataWrapper<T> implements ITokenData<T>{
 		private T additionalData;
 		private String requestIp;
 		private String tokenId;
@@ -207,53 +215,33 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * @throws Exception
 	 */
 	private static ServerData  getTokenDataFromAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
-		/*	String cfName = dSettings.toClientConfigurationName();
-			configureClientConfigurator(dSettings);
-			String d = Requester.request(cfName).path(MAIN_PATH).queryParam(TOKEN_PARAM, tokenId).get(MEDIA_TYPE.JSON).getResponseAsObject(String.class);
-			ObjectMapper objectMapper = new ObjectMapper(); 
-			ServerData w = objectMapper.readValue(d, ServerData.class);
-		return w;*/
 		return  (ServerData)autenticationCallBack.callBack(tokenId);
 	}
 	
 	
 	static boolean isTokenValid(IAuthenticationCallBack<Boolean, String> autenticationCallBack, String tokenId) throws Exception{
-		/*String cfName = dSettings.getServerSettings().toClientConfigurationName();
-		configureClientConfigurator(dSettings);
-		String d = Requester.request(cfName).path(MAIN_PATH).queryParam(TOKEN_PARAM, tokenId).get(MEDIA_TYPE.JSON).getResponseAsObject(String.class);
-		return false;*/
 		return autenticationCallBack.callBack(tokenId);
 	}
 	
-	/***
-	 * Retrieves token data from the authentication server!!!
-	 * @param tokenId
-	 * @return
-	 * @throws Exception 
-	 */
-	private static ServerData getTokenDataFromTokenAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
-	/*	DownloadSettings dSettings = new DownloadSettings();
-		dSettings.getServerSettings().fillFromString((String)CONTEXTPARAMS.TOKEN_AUTHENTICATION_SERVER.getValue());
-		dSettings.getServerSettings().setContext((String)CONTEXTPARAMS.TOKEN_AUTHENTICATION_SERVER_CONTEXT.getValue());*/
-		return getTokenDataFromAuthenticationServer(autenticationCallBack, tokenId);
-	}
 	
 	
 	static class TokenAuthenticationInner extends TokenAuthentication<Boolean>{
-		IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack;
+		IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack;
 		IAuthenticationCallBack<String,Object> getIpAddressCallBack;
 		IAuthenticationCallBack<Object, String> autenticationCallBack;
 		IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
 		IAuthenticationCallBack<Object, Object> logUserCallBack;
 		Object logUserCallBackParam;
+		Object httpservletRequest;
 		
-		public TokenAuthenticationInner(TokenCredentials tokenCredentials, 
-				IAuthenticationCallBack<ITokenData, String> getTokenDataCallBack,
+		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
+				IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
 				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
 				IAuthenticationCallBack<Object, String> autenticationCallBack,
 				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 				IAuthenticationCallBack<Object, Object> logUserCallBack, Object logUserCallBackParam) {
 			super(tokenCredentials);
+			this.httpservletRequest = httpservletRequest;
 			this.getTokenDataCallBack = getTokenDataCallBack;
 			this.getIpAddressCallBack = getIpAddressCallBack;
 			this.autenticationCallBack = autenticationCallBack;
@@ -270,14 +258,14 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			//SessionDataBean sb = (SessionDataBean)httpServletRequest.getSession(true).getAttribute(AppConstants.SESSION_DATA_BEAN);
 			
 			//get the ip that made the authentication request
-			String ipAddress = getIpAddressCallBack.callBack(null);   // AppUtil.getIpAdddress(httpServletRequest);
+			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);   // AppUtil.getIpAdddress(httpServletRequest);
 			
 			//get token id from request
 			String tokenId = getTokentCredentials().getToken().getTokenId();
 			
 			
 			//check if user is logged
-			if(checkifUserLoggedCallBack.callBack(null)){
+			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
 				return true;
 			}
 			/*if(sb !=null && sb.getVisit()!=null && sb.getVisit().getCurUser() !=null ){
@@ -307,10 +295,10 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			try {
 				
 				//get token data from server
-				tdata = getTokenDataFromTokenAuthenticationServer(autenticationCallBack, tokenId);
+				tdata = getTokenDataFromAuthenticationServer(autenticationCallBack, tokenId);
 				
 				//decrypt & analyze token data from server
-				tokenData = getTokenDataCallBack.callBack((String)tdata.tokenData.getAdditionalData());
+				tokenData = getTokenDataCallBack.callBack(tdata);
 				
 				/*//convert to bytes 
 				//ObjectMapper om = new ObjectMapper();
@@ -347,7 +335,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	}
 	
 	/***
-	 * Configures the targeted end point by the download settings!!!
+	 * Configures the targeted end point by the server settings!!!
 	 * @param sSettings
 	 * @throws UnrecoverableKeyException
 	 * @throws KeyManagementException
