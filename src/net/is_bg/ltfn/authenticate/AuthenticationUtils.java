@@ -1,6 +1,7 @@
 package net.is_bg.ltfn.authenticate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import token.ITokenData;
@@ -121,8 +122,8 @@ public class AuthenticationUtils {
 			IAuthenticationCallBack<String, Object> getIpAddressCallBack,
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-			IAuthenticationCallBack<Object, Object> userLoggedCallBack,
-			Object userLogParam){
+			IAuthenticationCallBack<Object, List<Object>> userLoggedCallBack,
+			List<Object> userLogParam){
     	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,
     			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
     			,userLoggedCallBack, userLogParam).getAuthentication();

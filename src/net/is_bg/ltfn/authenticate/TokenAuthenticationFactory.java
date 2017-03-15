@@ -1,6 +1,7 @@
 package net.is_bg.ltfn.authenticate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import token.IToken;
@@ -49,8 +50,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-			IAuthenticationCallBack<Object, Object> userLogcallBack,
-			Object callBackParam){
+			IAuthenticationCallBack<Object, List<Object>> userLogcallBack,
+			List<Object> callBackParam){
 		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
 				getTokenCredentials(httpsessionParamMap), 
 				getTokenDataCallBack, 
@@ -223,8 +224,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		IAuthenticationCallBack<String,Object> getIpAddressCallBack;
 		IAuthenticationCallBack<Object, String> autenticationCallBack;
 		IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
-		IAuthenticationCallBack<Object, Object> logUserCallBack;
-		Object logUserCallBackParam;
+		IAuthenticationCallBack<Object, List<Object>> logUserCallBack;
+		List<Object> logUserCallBackParam;
 		Object httpservletRequest;
 		
 		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
@@ -232,7 +233,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
 				IAuthenticationCallBack<Object, String> autenticationCallBack,
 				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-				IAuthenticationCallBack<Object, Object> logUserCallBack, Object logUserCallBackParam) {
+				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam) {
 			super(tokenCredentials);
 			this.httpservletRequest = httpservletRequest;
 			this.getTokenDataCallBack = getTokenDataCallBack;
@@ -260,15 +261,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
 				return true;
 			}
-			/*if(sb !=null && sb.getVisit()!=null && sb.getVisit().getCurUser() !=null ){
-				//user is already logged
-				
-				
-				return true;   
-			}*/
 			
 			//no visit
-			
 			
 			//no token in request
 			if(tokenId == null){
@@ -299,7 +293,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 						ApplicationGlobals.getApplicationGlobals().getLocator().getUserDao().getEncryptionKey(tdata.userKey, tdata.defDbCon)).getDecoder().decode(b);
 				tokenData =	TokenUtils.deserialize(b, b.length, ITokenData.class);*/
 				
-				System.out.println(tokenData);
+				//System.out.println(tokenData);
 				//tdata.setTokenData(tokenData);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -317,6 +311,11 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 				throw new RuntimeException("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 			}
+			
+			logUserCallBackParam.add(httpservletRequest);
+			logUserCallBackParam.add(tokenId);
+			logUserCallBackParam.add(tdata.getUserKey());
+			logUserCallBackParam.add(tdata.getDefDbCon());
 			
 			//log user
 			logUserCallBack.callBack(logUserCallBackParam);
