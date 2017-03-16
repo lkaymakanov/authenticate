@@ -15,7 +15,7 @@ class UserPassAuthenticationFactory implements IAuthenticationFactory {
 
     private UserPassAuthentication up;
 
-    public UserPassAuthenticationFactory(String user,
+    UserPassAuthenticationFactory(String user,
 					 String pass,
 					 IAuthenticationCallBack callBack,
 					 Object authenticationCallBackParam) {

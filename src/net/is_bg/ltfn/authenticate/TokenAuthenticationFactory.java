@@ -123,7 +123,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		void setDefDbCon(String defDbCon) {
 			this.defDbCon = defDbCon;
 		}
-		
 	}
 	
 	static class TokenDataWrapper<T> implements ITokenData<T>{
@@ -208,8 +207,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * @return
 	 * @throws Exception
 	 */
-	private static ServerDataEx  getTokenDataFromAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
-		return (ServerDataEx)autenticationCallBack.callBack(tokenId);
+	private static TokenDataUserData  getTokenDataFromAuthenticationServer(IAuthenticationCallBack<Object, String> autenticationCallBack, String tokenId) throws Exception{
+		return (TokenDataUserData)autenticationCallBack.callBack(tokenId);
 	}
 	
 	
@@ -276,7 +275,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}
 			
 			//retrieve tokenData from authentication server
-			ServerDataEx tdata = null;
+			TokenDataUserData tdata = null;
 			ITokenData tokenData = null;
 			try {
 				
@@ -285,14 +284,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				
 				//decrypt & analyze token data from server
 				tokenData = getTokenDataCallBack.callBack(tdata);
-				
-				/*//convert to bytes 
-				//ObjectMapper om = new ObjectMapper();
-				byte [] b = om.convertValue((String)tdata.tokenData.getAdditionalData(), byte[].class);
-				AuthenticationEncryptionUtils.getDecoderFactory(
-						ApplicationGlobals.getApplicationGlobals().getLocator().getUserDao().getEncryptionKey(tdata.userKey, tdata.defDbCon)).getDecoder().decode(b);
-				tokenData =	TokenUtils.deserialize(b, b.length, ITokenData.class);*/
-				
 				//System.out.println(tokenData);
 				//tdata.setTokenData(tokenData);
 			} catch (Exception e) {
@@ -325,51 +316,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		}
 	}
 	
-	/***
-	 * Configures the targeted end point by the server settings!!!
-	 * @param sSettings
-	 * @throws UnrecoverableKeyException
-	 * @throws KeyManagementException
-	 * @throws KeyStoreException
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 * @throws CertificateException 
-	 */
-	/*private static void configureClientConfigurator(ServerSettings settings) throws UnrecoverableKeyException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException{
-		Ssl ssl =  ClientConfigurator.configure(settings.toClientConfigurationName()).targetEndpoint(settings.toEndPoint()).readTimeout(settings.getReadTimeOut());
-		if(settings.isSecure()){
-			ssl.protocol(dSettings.getSocketProtocol()).
-			keystore(dSettings.getStoreType(), dSettings.getKeystoreFile(), dSettings.getKeystorePass()).
-			privateKey(dSettings.getKeyAlias(), dSettings.getKeyPass()).trustAllCerts().complete();
-		}else{
-			ssl.noSSL().complete();
-		}
-	}*/
-	
-	/*	
-	*//**The main path pointing to update center jersey servlet*//*
-	private final static IREST_PATH MAIN_PATH = new  IREST_PATH() {
-		@Override
-		public String getPath() {
-			// TODO Auto-generated method stub
-			return  ((String)CONTEXTPARAMS.TOKEN_AUTHENTICATION_PREFIX.getValue()) + TokenConstants.TOKEN_DATA_PATH;
-		}
-	}; 
-	
-	private final static IPARAM TOKEN_PARAM  = new IPARAM() {
-		@Override
-		public String getStringValue() {
-			// TODO Auto-generated method stub
-			return TokenConstants.TOKEN_ID_PARAM_NAME;
-		}
-	};*/
-	
-
-	
-	public static void main(String [] args) throws Exception{
-		//System.out.println(getTokenDataFromTokenAuthenticationServer("45C5C2E62E6D874D7AD93EABCDD2B4A0"));
-	}
 	
 
 	

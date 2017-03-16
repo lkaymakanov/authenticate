@@ -1,29 +1,22 @@
 package net.is_bg.ltfn.authenticate;
 
 import token.ITokenData;
+import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.ServerData;
+import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.TokenDataWrapper;
 
-public class TokenDataUserData {
-
-	private String userKey;
-	private String defDbCon;
-	private ITokenData tokenData;
+/**
+ * The exposed  structure of data that is coming from Authentication server!!!
+ * @author lubo
+ *
+ */
+public  class TokenDataUserData extends ServerData{
 	
-	public String getUserKey() {
-		return userKey;
+	TokenDataUserData() {
+		// TODO Auto-generated constructor stub
 	}
-	public void setUserKey(String userKey) {
-		this.userKey = userKey;
-	}
-	public ITokenData getTokenData() {
-		return tokenData;
-	}
-	public void setTokenData(ITokenData tokenData) {
-		this.tokenData = tokenData;
-	}
-	public String getDefDbCon() {
-		return defDbCon;
-	}
-	public void setDefDbCon(String defDbCon) {
-		this.defDbCon = defDbCon;
+	
+	TokenDataUserData(ITokenData tokenData, String userKey, String defDbCon) {
+		// TODO Auto-generated constructor stub
+		super((TokenDataWrapper)tokenData, userKey, defDbCon);
 	}
 }

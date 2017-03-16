@@ -69,16 +69,20 @@ public class AuthenticationUtils {
 
 
     
-    public static String getUserKeyFromServerData(Object sdata){
-    	return ((ServerDataEx)sdata).getUserKey();
+    public static String getUserKeyFromTokenDataUserData(TokenDataUserData sdata){
+    	return (sdata).getUserKey();
     }
   
-    public static String getConnectionNameFromServerData(Object sdata){
-    	return ((ServerDataEx)sdata).getDefDbCon();
+    public static String getConnectionNameFromTokenDataUserData(TokenDataUserData sdata){
+    	return (sdata).getDefDbCon();
     }
     
-    public static Object getTokenDataAdditionalData(Object sdata){
-    	return ((ServerDataEx)sdata).getTokenData().getAdditionalData();
+    public static Object getTokenDataAdditionalDataFromTokenDataUserData(TokenDataUserData sdata){
+    	return (sdata).getTokenData().getAdditionalData();
+    }
+    
+    public static TokenDataUserData createTokenDataUserData(ITokenData tokeData,String userKey, String defdbCon){
+    	return new TokenDataUserData(tokeData, userKey, defdbCon);
     }
     
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 
