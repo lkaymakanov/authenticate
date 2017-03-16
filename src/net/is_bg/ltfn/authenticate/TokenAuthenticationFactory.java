@@ -37,10 +37,9 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	 * Get token from request!!!
 	 * @return
 	 */
-	private static TokenCredentials getTokenCredentials(Map httpsesionParamMap){
+	static TokenCredentials getTokenCredentials(Map httpsesionParamMap){
 		String tokenId = getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : 
 			getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
-		System.out.println("TOKEN_ID:" +  tokenId);
 		return new TokenCredentials(new Token(tokenId));
 	}
 	
@@ -248,18 +247,17 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		public Boolean authenticate() throws AuthenticationException {
 			// TODO Auto-generated method stub
 			//authenticate with token here 
-			//SessionDataBean sb = (SessionDataBean)httpServletRequest.getSession(true).getAttribute(AppConstants.SESSION_DATA_BEAN);
 			
 			//get the ip that made the authentication request
-			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);   // AppUtil.getIpAdddress(httpServletRequest);
-			
-			//get token id from request
-			String tokenId = getTokentCredentials().getToken().getTokenId();
+			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);  
 			
 			//check if user is logged
 			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
 				return true;
 			}
+			
+			//get token id from request
+			String tokenId = getTokentCredentials().getToken().getTokenId();
 			
 			//no visit
 			
@@ -284,8 +282,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				
 				//decrypt & analyze token data from server
 				tokenData = getTokenDataCallBack.callBack(tdata);
-				//System.out.println(tokenData);
-				//tdata.setTokenData(tokenData);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -310,7 +306,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			
 			//log user
 			logUserCallBack.callBack(logUserCallBackParam);
-			//AuthenticationUtils.logUser(httpServletRequest, getUserByUserKey(tdata.userKey), tokenId, 0);
 			
 			return true;
 		}

@@ -8,6 +8,7 @@ import token.ITokenData;
 import token.TokenData.TokenDataBuilder;
 import token.TokenUtils;
 import authenticate.IAuthentication;
+import authenticate.TokenCredentials;
 
 /**
  * Authentication Utils !!!
@@ -67,6 +68,14 @@ public class AuthenticationUtils {
     	return new UserPassAuthenticationFactory(user, pass, callBack, callBackParam).getAuthentication();
     }
 
+    /***
+     * Returns token credentials from the sessionRequest Map!!!
+     * @param httpsesionParamMap
+     * @return
+     */
+    public static TokenCredentials getTokenCredentials(Map httpsesionParamMap){
+    	return TokenAuthenticationFactory.getTokenCredentials(httpsesionParamMap);
+    }
 
     /***
      * Extracts user key from token user data!!!
