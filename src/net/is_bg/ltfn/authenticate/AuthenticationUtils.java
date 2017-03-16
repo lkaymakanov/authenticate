@@ -81,8 +81,45 @@ public class AuthenticationUtils {
     	return (sdata).getTokenData().getAdditionalData();
     }
     
-    public static TokenDataUserData createTokenDataUserData(ITokenData tokeData,String userKey, String defdbCon){
-    	return new TokenDataUserData(tokeData, userKey, defdbCon);
+    public static Object createTokenDataUserData(ITokenData tokeData,String userKey, String defdbCon){
+    	return new TokenDataUserDataFromServer(tokeData, userKey, defdbCon);
+    }
+    
+    private static class TokenDataUserDataFromServer {
+    	
+    	    private String userKey;
+    		private String defDbCon;
+    		private ITokenData tokenData;
+    
+			public String getUserKey() {
+				return userKey;
+			}
+			public void setUserKey(String userKey) {
+				this.userKey = userKey;
+			}
+			public ITokenData getTokenData() {
+				return tokenData;
+			}
+			TokenDataUserDataFromServer() {
+				// TODO Auto-generated constructor stub
+		 	}
+			public void setTokenData(ITokenData tokenData) {
+				this.tokenData = tokenData;
+			}
+			public String getDefDbCon() {
+				return defDbCon;
+			}
+			public void setDefDbCon(String defDbCon) {
+				this.defDbCon = defDbCon;
+			}
+			
+			TokenDataUserDataFromServer(ITokenData tokeData,String userKey, String defdbCon) {
+				// TODO Auto-generated constructor stub
+				this.tokenData = tokeData;
+				this.userKey = userKey;
+				this.defDbCon = defdbCon;
+		 	}
+    			
     }
     
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 

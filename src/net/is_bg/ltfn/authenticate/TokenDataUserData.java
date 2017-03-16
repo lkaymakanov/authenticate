@@ -1,6 +1,5 @@
 package net.is_bg.ltfn.authenticate;
 
-import token.ITokenData;
 import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.ServerData;
 import net.is_bg.ltfn.authenticate.TokenAuthenticationFactory.TokenDataWrapper;
 
@@ -15,8 +14,10 @@ public  class TokenDataUserData extends ServerData{
 		// TODO Auto-generated constructor stub
 	}
 	
-	TokenDataUserData(ITokenData tokenData, String userKey, String defDbCon) {
+	TokenDataUserData(TokenDataWrapper tokenData, String userKey, String defDbCon) {
 		// TODO Auto-generated constructor stub
-		super((TokenDataWrapper)tokenData, userKey, defDbCon);
+		super(tokenData, userKey, defDbCon);
 	}
+	
+	
 }
