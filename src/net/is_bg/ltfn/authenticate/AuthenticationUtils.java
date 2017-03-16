@@ -28,6 +28,7 @@ public class AuthenticationUtils {
 	 */
 	public static void addTokenIdSessionId(String tokenId, String sessionId){
 		synchronized(tokenIdSessionIdMap){
+			if(!tokenIdSessionIdMap.containsKey(tokenId))
 			tokenIdSessionIdMap.put(tokenId, sessionId);
 		}
 	}
@@ -47,11 +48,12 @@ public class AuthenticationUtils {
 	 * Removes token from tokenIdSessionIdMap
 	 * @param tokenId
 	 */
-	public static void invalidateTokenId(String tokenId){
-		if(tokenId  == null) return ;
+	public static String invalidateTokenId(String tokenId){
+		if(tokenId  == null) return null;
 		synchronized(tokenIdSessionIdMap){
 			String sessionId = tokenIdSessionIdMap.get(tokenId);
-			tokenIdSessionIdMap.remove(sessionId);
+			tokenIdSessionIdMap.remove(tokenId);
+			return sessionId;
 		}
 	}
 
@@ -215,10 +217,10 @@ public class AuthenticationUtils {
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 			IAuthenticationCallBack<Object, List<Object>> userLoggedCallBack,
-			List<Object> userLogParam){
+			List<Object> userLogParam, boolean supressIpCheck){
     	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,
     			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
-    			,userLoggedCallBack, userLogParam).getAuthentication();
+    			,userLoggedCallBack, userLogParam, supressIpCheck).getAuthentication();
     }
     
     

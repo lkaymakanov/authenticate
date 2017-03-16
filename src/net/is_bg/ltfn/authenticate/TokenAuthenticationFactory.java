@@ -50,6 +50,25 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			IAuthenticationCallBack<Object, String> autenticationCallBack,
 			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
 			IAuthenticationCallBack<Object, List<Object>> userLogcallBack,
+			List<Object> callBackParam, boolean supressIpCheck){
+		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
+				getTokenCredentials(httpsessionParamMap), 
+				getTokenDataCallBack, 
+				getIpAddressCallBack,
+				autenticationCallBack, 
+				checkifUserLoggedCallBack, 
+				userLogcallBack, 
+				callBackParam, supressIpCheck);
+	}
+	
+	
+	TokenAuthenticationFactory(Map httpsessionParamMap,
+			Object httpServletRequest,
+			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
+			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+			IAuthenticationCallBack<Object, String> autenticationCallBack,
+			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
+			IAuthenticationCallBack<Object, List<Object>> userLogcallBack,
 			List<Object> callBackParam){
 		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
 				getTokenCredentials(httpsessionParamMap), 
@@ -58,7 +77,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				autenticationCallBack, 
 				checkifUserLoggedCallBack, 
 				userLogcallBack, 
-				callBackParam);
+				callBackParam, false);
 	}
 	
 	@Override
@@ -218,20 +237,21 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	
 	
 	static class TokenAuthenticationInner extends TokenAuthentication<Boolean>{
-		IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack;
-		IAuthenticationCallBack<String,Object> getIpAddressCallBack;
-		IAuthenticationCallBack<Object, String> autenticationCallBack;
-		IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
-		IAuthenticationCallBack<Object, List<Object>> logUserCallBack;
-		List<Object> logUserCallBackParam;
-		Object httpservletRequest;
+		private  IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack;
+		private  IAuthenticationCallBack<String,Object> getIpAddressCallBack;
+		private  IAuthenticationCallBack<Object, String> autenticationCallBack;
+		private  IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
+		private  IAuthenticationCallBack<Object, List<Object>> logUserCallBack;
+		private  List<Object> logUserCallBackParam;
+		private  Object httpservletRequest;
+		private  boolean SUPPRESS_IP_CHECK;
 		
 		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
 				IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
 				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
 				IAuthenticationCallBack<Object, String> autenticationCallBack,
 				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam) {
+				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam, boolean suppressIpCheck) {
 			super(tokenCredentials);
 			this.httpservletRequest = httpservletRequest;
 			this.getTokenDataCallBack = getTokenDataCallBack;
@@ -240,16 +260,27 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			this.checkifUserLoggedCallBack = checkifUserLoggedCallBack;
 			this.logUserCallBack = logUserCallBack;
 			this.logUserCallBackParam = logUserCallBackParam;
+			this.SUPPRESS_IP_CHECK = suppressIpCheck;
 		}
 		
+		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
+				IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
+				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
+				IAuthenticationCallBack<Object, String> autenticationCallBack,
+				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
+				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam){
+			this(httpservletRequest,  tokenCredentials, 
+				 getTokenDataCallBack,
+				 getIpAddressCallBack,
+				 autenticationCallBack,
+				 checkifUserLoggedCallBack,
+				 logUserCallBack, logUserCallBackParam, false);
+		}
 
 		@Override
 		public Boolean authenticate() throws AuthenticationException {
 			// TODO Auto-generated method stub
 			//authenticate with token here 
-			
-			//get the ip that made the authentication request
-			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);  
 			
 			//check if user is logged
 			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
@@ -268,7 +299,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			
 			//invalid token
 			if( tokenId.equals(TokenConstants.IVALID_TOKEN_ID)){
-				System.out.println(tokenId);
 				throw new InvalidTokenException(TokenConstants.IVALID_TOKEN_ID);
 			}
 			
@@ -293,9 +323,12 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				throw new RuntimeException("Token data is null...");
 			}
 			
+			//get the ip that made the authentication request
+			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);  
+			
 			//ip do not match!!!
-			if(!tokenData.getRequestIp().equals(ipAddress)){
-				System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
+			if(!SUPPRESS_IP_CHECK && !tokenData.getRequestIp().equals(ipAddress)){
+				//System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 				throw new RuntimeException("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 			}
 			
