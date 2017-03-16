@@ -68,23 +68,49 @@ public class AuthenticationUtils {
     }
 
 
-    
+    /***
+     * Extracts user key from token user data!!!
+     * @param sdata
+     * @return
+     */
     public static String getUserKeyFromTokenDataUserData(TokenDataUserData sdata){
     	return (sdata).getUserKey();
     }
   
+    /***
+     * Extracts connection name  from token user data!!!
+     * @param sdata
+     * @return
+     */
     public static String getConnectionNameFromTokenDataUserData(TokenDataUserData sdata){
     	return (sdata).getDefDbCon();
     }
     
+    /***
+     * Extracts additional data from token user data!!! In this implementations this is byte array!!!
+     * @param sdata
+     * @return
+     */
     public static Object getTokenDataAdditionalDataFromTokenDataUserData(TokenDataUserData sdata){
     	return (sdata).getTokenData().getAdditionalData();
     }
     
-    public static Object createTokenDataUserData(ITokenData tokeData,String userKey, String defdbCon){
+    /***
+     * Creates the data structure that is send to client when client requests token info!!!
+     * @param tokeData
+     * @param userKey
+     * @param defdbCon
+     * @return
+     */
+    public static Object createTokenDataUserData(ITokenData tokeData, String userKey, String defdbCon){
     	return new TokenDataUserDataFromServer(tokeData, userKey, defdbCon);
     }
     
+    /***
+     * A private class used only to encapsulate token details that are send to client!!!
+     * @author lubo
+     *
+     */
     private static class TokenDataUserDataFromServer {
     	
     	    private String userKey;
@@ -122,6 +148,22 @@ public class AuthenticationUtils {
     			
     }
     
+    /***
+     * Creates token encrypted token data  that contains the following
+     *  </br>- ip address of the request that created this token
+     *  </br>- the session id associated with this token
+     *  </br>- token id
+     *  </br>- user id
+     * @param cl
+     * @param ipAddress
+     * @param sessionId
+     * @param userId
+     * @param userKey
+     * @param callBack a callback & callback param that resolves encryption key
+     * @param callBackParam a callback & callback param that resolves encryption key
+     * @return
+     * @throws Exception
+     */
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 
     					  String userKey, IAuthenticationCallBack<String, String> callBack, String callBackParam
 						 )
