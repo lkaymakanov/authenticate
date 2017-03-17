@@ -64,7 +64,7 @@ public class AuthenticationUtils {
 	 * @param httpsesionParamMap
 	 * @return
 	 */
-	public String getTokenFromRequestMap(Map httpsesionParamMap){
+	public static String getTokenFromRequestMap(Map httpsesionParamMap){
 		return TokenAuthenticationFactory.getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
 	}
 	
@@ -73,7 +73,7 @@ public class AuthenticationUtils {
 	 * @param httpsesionParamMap
 	 * @return
 	 */
-	public boolean isTokenInRequest(Map httpsesionParamMap){
+	public static boolean isTokenInRequest(Map httpsesionParamMap){
 		return getTokenFromRequestMap(httpsesionParamMap) != null;
 	}
 	
