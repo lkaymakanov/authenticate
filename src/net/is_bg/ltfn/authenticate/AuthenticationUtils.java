@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import token.ITokenData;
+import token.TokenConstants;
 import token.TokenData.TokenDataBuilder;
 import token.TokenUtils;
 import authenticate.IAuthentication;
@@ -56,10 +57,51 @@ public class AuthenticationUtils {
 			return sessionId;
 		}
 	}
+	
+	
+	/**
+	 * Try to get token from Request Map if no token returns null!!!
+	 * @param httpsesionParamMap
+	 * @return
+	 */
+	public String getTokenFromRequestMap(Map httpsesionParamMap){
+		return TokenAuthenticationFactory.getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME);
+	}
+	
+	/***
+	 * Check if request contains token in param map!!!
+	 * @param httpsesionParamMap
+	 * @return
+	 */
+	public boolean isTokenInRequest(Map httpsesionParamMap){
+		return getTokenFromRequestMap(httpsesionParamMap) != null;
+	}
+	
+	
+	   
+    /**
+     * Check if token is valid in the authentication server!!!
+     * @param callBack
+     * @param tokenId
+     * @return
+     * @throws Exception
+     */
+    public static Boolean isTokenValid(IAuthenticationCallBack<Boolean, String> callBack, String tokenId) throws Exception{
+    	return TokenAuthenticationFactory.isTokenValid(callBack, tokenId);
+    }
+    
+    /**
+     * Check if token Id is associated with any session in this application!!!
+     * @param tokenId
+     * @return
+     */
+    public static boolean isTokenAssociatedWithSession(String tokenId){
+    	if(tokenId == null) return false;
+    	return tokenIdSessionIdMap.containsKey(tokenId);
+    }
 
     /**
      * Gets a user password based authentication!!!
-     * 
      * @param user
      * @param pass
      * @param dbConnName
@@ -219,21 +261,11 @@ public class AuthenticationUtils {
 			IAuthenticationCallBack<Object, List<Object>> userLoggedCallBack,
 			List<Object> userLogParam, boolean supressIpCheck){
     	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,
-    			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack
-    			,userLoggedCallBack, userLogParam, supressIpCheck).getAuthentication();
+    			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack, null
+    			,userLoggedCallBack,  userLogParam, supressIpCheck).getAuthentication();
     }
     
-    
-    /**
-     * Check if token is valid!!!
-     * @param callBack
-     * @param tokenId
-     * @return
-     * @throws Exception
-     */
-    public static Boolean isTokenValid(IAuthenticationCallBack<Boolean, String> callBack, String tokenId) throws Exception{
-    	return TokenAuthenticationFactory.isTokenValid(callBack, tokenId);
-    }
+ 
     
     
 }
