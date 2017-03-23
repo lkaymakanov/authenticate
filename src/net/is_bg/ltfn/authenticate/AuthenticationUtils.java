@@ -254,18 +254,26 @@ public class AuthenticationUtils {
      */
     public static IAuthentication getTokenAuthentication(Map httpsesionParamMap,
     		Object httpServletRequest,
-			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
-			IAuthenticationCallBack<String, Object> getIpAddressCallBack,
-			IAuthenticationCallBack<Object, String> autenticationCallBack,
-			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-			IAuthenticationCallBack<Object, List<Object>> userLoggedCallBack,
-			List<Object> userLogParam, boolean supressIpCheck){
-    	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,
-    			getTokenDataCallBack, getIpAddressCallBack, autenticationCallBack, checkifUserLoggedCallBack, null
-    			,userLoggedCallBack,  userLogParam, supressIpCheck).getAuthentication();
+			ITokenAuthneticationCallBacksFactory tokenCallBacks,
+			TokenAuthenticationParams tokenAuthenticationParams
+			){
+    	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest, tokenCallBacks, tokenAuthenticationParams).getAuthentication();
     }
     
- 
+    
+    public interface ITokenAuthneticationCallBacks {
+		  IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack();
+		  IAuthenticationCallBack<String, Object> getIpAddressCallBack();
+		  IAuthenticationCallBack<Object, String> autenticationCallBack();
+		  IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack();
+		  IAuthenticationCallBack<Object, List<Object>> userLogCallBack();
+		  IAuthenticationCallBack<Boolean, String> isTokenValidCallBack();
+	}
+
+
+	public static interface ITokenAuthneticationCallBacksFactory {
+		public ITokenAuthneticationCallBacks getITokenAuthneticationCallBacks();
+	}
     
     
 }

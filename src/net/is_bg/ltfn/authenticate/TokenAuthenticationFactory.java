@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacksFactory;
 import token.IToken;
 import token.ITokenData;
 import token.TokenConstants;
@@ -43,46 +44,17 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		return new TokenCredentials(new Token(tokenId));
 	}
 	
-	TokenAuthenticationFactory(Map httpsessionParamMap,
+	TokenAuthenticationFactory(
+			Map httpsessionParamMap,
 			Object httpServletRequest,
-			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
-			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
-			IAuthenticationCallBack<Object, String> autenticationCallBack,
-			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-			IAuthenticationCallBack<Boolean, String> isTokenValidCallBack,
-			IAuthenticationCallBack<Object, List<Object>> userLogcallBack,
-			List<Object> callBackParam, boolean supressIpCheck){
+			ITokenAuthneticationCallBacksFactory tokenAuthneticationCallBackFactory,
+			TokenAuthenticationParams tokenParams){
 		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
 				getTokenCredentials(httpsessionParamMap), 
-				getTokenDataCallBack, 
-				getIpAddressCallBack,
-				autenticationCallBack, 
-				checkifUserLoggedCallBack, 
-				isTokenValidCallBack,
-				userLogcallBack, 
-				callBackParam, supressIpCheck);
+				tokenAuthneticationCallBackFactory, tokenParams);
 	}
 	
 	
-	TokenAuthenticationFactory(Map httpsessionParamMap,
-			Object httpServletRequest,
-			IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
-			IAuthenticationCallBack<String,Object> getIpAddressCallBack,
-			IAuthenticationCallBack<Object, String> autenticationCallBack,
-			IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-			IAuthenticationCallBack<Boolean, String> isTokenValidCallBack,
-			IAuthenticationCallBack<Object, List<Object>> userLogcallBack,
-			List<Object> callBackParam){
-		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
-				getTokenCredentials(httpsessionParamMap), 
-				getTokenDataCallBack, 
-				getIpAddressCallBack,
-				autenticationCallBack, 
-				checkifUserLoggedCallBack, 
-				isTokenValidCallBack,
-				userLogcallBack, 
-				callBackParam, false);
-	}
 	
 	@Override
 	public IAuthentication<Boolean> getAuthentication() {
@@ -248,50 +220,19 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	
 	
 	static class TokenAuthenticationInner extends TokenAuthentication<Boolean>{
-		private  IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack;
-		private  IAuthenticationCallBack<String,Object> getIpAddressCallBack;
-		private  IAuthenticationCallBack<Object, String> autenticationCallBack;
-		private  IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack;
-		private IAuthenticationCallBack<Boolean, String> isTokenValidCallBack;
-		private  IAuthenticationCallBack<Object, List<Object>> logUserCallBack;
-		private  List<Object> logUserCallBackParam;
-		private  Object httpservletRequest;
-		private  boolean SUPPRESS_IP_CHECK;
+	    private ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
+		private TokenAuthenticationParams tokenParams;
+		private Object httpservletRequest;
 		
 		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
-				IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
-				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
-				IAuthenticationCallBack<Object, String> autenticationCallBack,
-				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-				IAuthenticationCallBack<Boolean, String> isTokenValidCallBack,
-				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam, boolean suppressIpCheck) {
+				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory,
+				TokenAuthenticationParams tokenParams) {
 			super(tokenCredentials);
 			this.httpservletRequest = httpservletRequest;
-			this.getTokenDataCallBack = getTokenDataCallBack;
-			this.getIpAddressCallBack = getIpAddressCallBack;
-			this.autenticationCallBack = autenticationCallBack;
-			this.checkifUserLoggedCallBack = checkifUserLoggedCallBack;
-			this.logUserCallBack = logUserCallBack;
-			this.isTokenValidCallBack = isTokenValidCallBack;
-			this.logUserCallBackParam = logUserCallBackParam;
-			this.SUPPRESS_IP_CHECK = suppressIpCheck;
+			this.tokenAuthenticationCallBackFactory = tokenAuthenticationCallBackFactory;
+			this.tokenParams = tokenParams;
 		}
 		
-		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
-				IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack,
-				IAuthenticationCallBack<String,Object> getIpAddressCallBack,
-				IAuthenticationCallBack<Object, String> autenticationCallBack,
-				IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack,
-				IAuthenticationCallBack<Boolean, String> isTokenValidCallBack,
-				IAuthenticationCallBack<Object, List<Object>> logUserCallBack, List<Object> logUserCallBackParam){
-			this(httpservletRequest,  tokenCredentials, 
-				 getTokenDataCallBack,
-				 getIpAddressCallBack,
-				 autenticationCallBack,
-				 checkifUserLoggedCallBack,
-				 isTokenValidCallBack,
-				 logUserCallBack, logUserCallBackParam, false);
-		}
 
 		@Override
 		public Boolean authenticate() throws AuthenticationException {
@@ -307,7 +248,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}*/
 			
 			//check if user is logged
-			if(checkifUserLoggedCallBack.callBack(httpservletRequest)){
+			if(tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().checkifUserLoggedCallBack().callBack(httpservletRequest)){
 				return true;
 			}
 			
@@ -330,10 +271,10 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			try {
 				
 				//get token data from server
-				tdata = getTokenDataFromAuthenticationServer(autenticationCallBack, tokenId);
+				tdata = getTokenDataFromAuthenticationServer(tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().autenticationCallBack(), tokenId);
 				
 				//decrypt & analyze token data from server
-				tokenData = getTokenDataCallBack.callBack(tdata);
+				tokenData = tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().getTokenDataCallBack().callBack(tdata);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -346,21 +287,21 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}
 			
 			//get the ip that made the authentication request
-			String ipAddress = getIpAddressCallBack.callBack(httpservletRequest);  
+			String ipAddress = tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().getIpAddressCallBack().callBack(httpservletRequest);  
 			
 			//ip do not match!!!
-			if(!SUPPRESS_IP_CHECK && !tokenData.getRequestIp().equals(ipAddress)){
+			if(!tokenParams.isSupressIpCheck() && !tokenData.getRequestIp().equals(ipAddress)){
 				//System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 				throw new RuntimeException("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 			}
 			
-			logUserCallBackParam.add(httpservletRequest);
-			logUserCallBackParam.add(tokenId);
-			logUserCallBackParam.add(tdata.getUserKey());
-			logUserCallBackParam.add(tdata.getDefDbCon());
+			tokenParams.getUserLogCallBackParam().add(httpservletRequest);
+			tokenParams.getUserLogCallBackParam().add(tokenId);
+			tokenParams.getUserLogCallBackParam().add(tdata.getUserKey());
+			tokenParams.getUserLogCallBackParam().add(tdata.getDefDbCon());
 			
 			//log user
-			logUserCallBack.callBack(logUserCallBackParam);
+			tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().userLogCallBack().callBack(tokenParams.getUserLogCallBackParam());
 			
 			return true;
 		}
