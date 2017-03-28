@@ -7,6 +7,7 @@ public class TokenAuthenticationParams  {
 	private boolean allowTokenAuthentication;
 	private List<Object> userLogCallBackParam;
 	private boolean supressIpCheck;
+	private boolean overWriteUser;
 	
 	public boolean isAllowTokenAuthentication() {
 		return allowTokenAuthentication;
@@ -25,6 +26,12 @@ public class TokenAuthenticationParams  {
 	}
 	public void setSupressIpCheck(boolean supressIpCheck) {
 		this.supressIpCheck = supressIpCheck;
+	}
+	public boolean isOverWriteUser() {
+		return overWriteUser;
+	}
+	public void setOverWriteUser(boolean overWriteUser) {
+		this.overWriteUser = overWriteUser;
 	}
 	
 }
