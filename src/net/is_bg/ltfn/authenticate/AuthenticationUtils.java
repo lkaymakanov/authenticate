@@ -234,6 +234,9 @@ public class AuthenticationUtils {
 		// encrypt token with user key
 		tokenDataBuilder = new TokenDataBuilder<byte[]>();
 		//String userKey = curUser.getUserKey();
+		tokenDataBuilder.setRequestIp(ipAddress);
+		tokenDataBuilder.setTokenId(sessionId);
+		tokenDataBuilder.setTokenSessionId(sessionId);
 		tokenDataBuilder.setUserId(userKey);
 		String userEncryptionKey = callBack.callBack(callBackParam);
 		byte[] data = AuthenticationEncryptionUtils.getEncoderFactory(cl, userEncryptionKey)
