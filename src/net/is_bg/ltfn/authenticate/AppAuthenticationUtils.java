@@ -233,6 +233,7 @@ public class AppAuthenticationUtils {
 		public void setOverWriteUser(boolean b);
 		public String getTokenId();
 		public Object getUser();
+		public String getSessionId();
 	}
 	
 	public static  interface IRequestHelper{
