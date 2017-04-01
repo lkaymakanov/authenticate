@@ -129,7 +129,9 @@ public class AppAuthenticationUtils {
 				l.log("isTokenInRequest " + isTokenInRequest);
 				
 				if(isTokenLogin){
-					if(!isTokenInRequest)  ;//throw new RuntimeException("This session is associated with token & no token is found in request...");
+					if(!isTokenInRequest) {
+						if(!callBacks.isTokenValidCallBack().callBack(sessionData.getTokenId())) throw new RuntimeException("The session is associated with token that is already invalid...");
+					}//;//throw new RuntimeException("This session is associated with token & no token is found in request...");
 					else if(!callBacks.isTokenValidCallBack().callBack(tokenId)) throw new RuntimeException("Invalid token in request...");
 					else{
 						//check if token is associated with different sessionId
