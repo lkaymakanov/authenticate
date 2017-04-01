@@ -59,7 +59,7 @@ public class AppAuthenticationUtils {
 		
 		static  String LOGIN_PAGE = "pages/login.jsf";
 		static  String MAIN_FORM_PAGE = "pages/mainform.jsf";
-		static  String EMPTY_PAGE = "/pages/empty.jsf";
+		static  String EMPTY_PAGE = "pages/empty.jsf";
 		private Object httpServletRequest;
 
 		ITokenAuthneticationCallBacksFactory itokenAuthenticationCallBackFactory;
@@ -110,6 +110,7 @@ public class AppAuthenticationUtils {
 			Object u = sessionData.getUser();
 			UserNavigationPage userNav = new UserNavigationPage();
 			AuthenticationLogger l =  new AuthenticationLogger(tokenParams.isVerbose());
+			
 			userNav.user = u;
 			if(u == null){
 				l.log("No user is logged..");
@@ -137,8 +138,8 @@ public class AppAuthenticationUtils {
 						//valid token in request 
 						if(!tokenId.equals(sessionData.getTokenId())){
 							//token in request is different from token in user session
-							l.log("Token i request is " + tokenId + " Token in session is " + sessionData.getTokenId());
-							l.log("overwrite user is " + tokenParams.isOverWriteUser());
+							l.log("Token in request is " + tokenId + " Token in session is " + sessionData.getTokenId());
+							l.log("Overwrite user is " + tokenParams.isOverWriteUser());
 							sessionData.setOverWriteUser(tokenParams.isOverWriteUser());
 							try{
 								tokenAuthentication(httpServletRequest, reqhlp.getParameterMap());
@@ -163,8 +164,8 @@ public class AppAuthenticationUtils {
 			//try token login if token login is supported & user is not logged in
 			boolean ta = tokenParams.isAllowTokenAuthentication();
 			if(ta && !userNav.isLogged()  ){
+				checkTokenSessionAssociation(l,  AuthenticationUtils.getTokenFromRequestMap(reqhlp.getParameterMap()), sessionData);
 				try {
-					checkTokenSessionAssociation(l,  AuthenticationUtils.getTokenFromRequestMap(reqhlp.getParameterMap()), sessionData);
 					if(tokenAuthentication(httpServletRequest, reqhlp.getParameterMap())){
 						userNav.setLogged(true);
 						userNav.navPage = null;
@@ -198,8 +199,7 @@ public class AppAuthenticationUtils {
 		@SuppressWarnings("unused")
 		String thisSessionId = sessionData.getSessionId(); l.log("This session id is " + thisSessionId);
 		String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
-		
-		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...");
+		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...  Use Other token or log out & log in again..");
 	}
 	
 

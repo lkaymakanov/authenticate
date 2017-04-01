@@ -3,6 +3,7 @@ package net.is_bg.ltfn.authenticate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import token.ITokenData;
 import token.TokenConstants;
@@ -31,6 +32,16 @@ public class AuthenticationUtils {
 		synchronized(tokenIdSessionIdMap){
 			if(!tokenIdSessionIdMap.containsKey(tokenId))
 			tokenIdSessionIdMap.put(tokenId, sessionId);
+		}
+	}
+	
+	/**
+	 * Get the keys of the token session map!!!
+	 * @return
+	 */
+	public static Set<String> getTokenKeys(){
+		synchronized(tokenIdSessionIdMap){
+			return tokenIdSessionIdMap.keySet();
 		}
 	}
 	
