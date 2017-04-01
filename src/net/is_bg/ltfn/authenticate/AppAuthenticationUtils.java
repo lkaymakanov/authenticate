@@ -133,7 +133,7 @@ public class AppAuthenticationUtils {
 					else{
 						//check if token is associated with different sessionId
 						@SuppressWarnings("unused")
-						String thisSessionId = reqhlp.getTokenId(); l.log("This session id is " + thisSessionId);
+						String thisSessionId = sessionData.getSessionId(); l.log("This session id is " + thisSessionId);
 						String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
 						
 						if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...");
