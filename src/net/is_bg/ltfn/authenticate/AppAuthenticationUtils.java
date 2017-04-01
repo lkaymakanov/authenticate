@@ -196,8 +196,9 @@ public class AppAuthenticationUtils {
 	
 	
 	private static void checkTokenSessionAssociation(AuthenticationLogger l, String tokenId, ISessionData sessionData){
+		if(tokenId == null || tokenId.equals(TokenConstants.IVALID_TOKEN_ID)) return;
 		@SuppressWarnings("unused")
-		String thisSessionId = sessionData.getSessionId(); l.log("This session id is " + thisSessionId);
+		String thisSessionId = sessionData.getSessionId(); l.log("Token Id is " + tokenId + ", This session id is " + thisSessionId);
 		String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
 		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...  Use Other token or log out & log in again..");
 	}
