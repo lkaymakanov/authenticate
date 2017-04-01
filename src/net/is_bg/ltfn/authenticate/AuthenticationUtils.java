@@ -30,6 +30,8 @@ public class AuthenticationUtils {
 	 */
 	public static void addTokenIdSessionId(String tokenId, String sessionId){
 		synchronized(tokenIdSessionIdMap){
+			if(tokenId == null || tokenId.equals(TokenConstants.IVALID_TOKEN_ID)) return;
+			System.out.println("Associating token id = " + tokenId +  " with session id = "+sessionId);
 			if(!tokenIdSessionIdMap.containsKey(tokenId))
 			tokenIdSessionIdMap.put(tokenId, sessionId);
 		}
