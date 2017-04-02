@@ -30,11 +30,9 @@ public class AppAuthenticationUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	private static IAuthentication<Boolean>  getTokenAuthenticator(Object httpServletRequest, Map requestParamMap, 
-			ITokenAuthneticationCallBacksFactory itokenAuthenticationCallBackFactory,
-			IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
-			TokenAuthenticationParams tokenParams){
+			ITokenAuthenticationConfiguration tokenAuthenticationConfiguration){
 		return 		AuthenticationUtils.getTokenAuthentication(requestParamMap, 
-						httpServletRequest,  itokenAuthenticationCallBackFactory,tokenParams);
+						httpServletRequest, tokenAuthenticationConfiguration);
 	}
 	
 	
@@ -45,10 +43,8 @@ public class AppAuthenticationUtils {
 	 * @param httpServletResponse
 	 * @throws IOException
 	 */
-	public static UserNavigationPage checkifLogged(Object httpServletRequest, ITokenAuthneticationCallBacksFactory itokenAuthenticationCallBackFactory,
-			IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
-			TokenAuthenticationParams tokenParams) throws IOException{
-		return new HpptServletRequestAuthentication(httpServletRequest, itokenAuthenticationCallBackFactory,  requestHelperFactory,  sessionDataFactory, tokenParams).checkiflogged();
+	public static UserNavigationPage checkifLogged(Object httpServletRequest, ITokenAuthenticationConfiguration tokenAuthenticationConfiguration) throws IOException{
+		return new HpptServletRequestAuthentication(httpServletRequest, tokenAuthenticationConfiguration).checkiflogged();
 	}
 	
 	
@@ -57,26 +53,16 @@ public class AppAuthenticationUtils {
 	
 	private static class HpptServletRequestAuthentication {
 		
-		static  String LOGIN_PAGE = "pages/login.jsf";
-		static  String MAIN_FORM_PAGE = "pages/mainform.jsf";
-		static  String EMPTY_PAGE = "pages/empty.jsf";
+		
 		private Object httpServletRequest;
-
-		ITokenAuthneticationCallBacksFactory itokenAuthenticationCallBackFactory;
-		TokenAuthenticationParams tokenParams;
-		IRequestHelperFactory requestHelperFactory;
-		ISessionDataFactory sessionDataFactory;
+		private ITokenAuthenticationConfiguration tokenAuthenticationConfiguration;
+		
 		
 		/**Package private constructor!!!*/
 		HpptServletRequestAuthentication(Object httpServletRequest,
-				ITokenAuthneticationCallBacksFactory itokenAuthenticationCallBackFactory,
-				IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
-				TokenAuthenticationParams tokenParams){
+				ITokenAuthenticationConfiguration tokenAuthenticationConfiguration){
 			this.httpServletRequest = httpServletRequest;
-			this.itokenAuthenticationCallBackFactory = itokenAuthenticationCallBackFactory;
-			this.sessionDataFactory = sessionDataFactory;
-			this.requestHelperFactory = requestHelperFactory;
-			this.tokenParams = tokenParams;
+			
 		}
 
 		/**
@@ -85,7 +71,7 @@ public class AppAuthenticationUtils {
 		 * @return
 		 */
 		private  String getLoginPage(AUTHENTICATION_TYPE t){
-			if(t == AUTHENTICATION_TYPE.USERPASS) return LOGIN_PAGE;
+			if(t == AUTHENTICATION_TYPE.USERPASS) return tokenAuthenticationConfiguration.getLoginPage();
 			return null;
 		}
 		
@@ -97,16 +83,18 @@ public class AppAuthenticationUtils {
 		 * @throws AuthenticationException
 		 */
 		private  Boolean tokenAuthentication(Object httpServletRequest, Map requestparams) throws AuthenticationException{
-			return AppAuthenticationUtils.getTokenAuthenticator(httpServletRequest, requestparams, itokenAuthenticationCallBackFactory, requestHelperFactory, sessionDataFactory, tokenParams).authenticate();
+			return AppAuthenticationUtils.getTokenAuthenticator(httpServletRequest, requestparams, 
+					tokenAuthenticationConfiguration).authenticate();
 		}
 		
 		/**
 		 * Check if user is logged!
 		 */
 		UserNavigationPage checkiflogged() throws IOException{
-			ITokenAuthneticationCallBacks callBacks = itokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks();
-			IRequestHelper reqhlp = requestHelperFactory.getIRequestHelper(httpServletRequest);
-			ISessionData sessionData = sessionDataFactory.getISessionData(httpServletRequest);
+			TokenAuthenticationParams tokenParams = tokenAuthenticationConfiguration.getTokenAuthenticationParams();
+			ITokenAuthneticationCallBacks callBacks = tokenAuthenticationConfiguration.getTokenAuthenticationCallBackFactory().getITokenAuthneticationCallBacks();
+			IRequestHelper reqhlp = tokenAuthenticationConfiguration.getRequestHelperFactory().getIRequestHelper(httpServletRequest);
+			ISessionData sessionData = tokenAuthenticationConfiguration.getSessionDataFactory().getISessionData(httpServletRequest);
 			Object u = sessionData.getUser();
 			UserNavigationPage userNav = new UserNavigationPage();
 			AuthenticationLogger l =  new AuthenticationLogger(tokenParams.isVerbose());
@@ -158,7 +146,7 @@ public class AppAuthenticationUtils {
 				//no token login 
 				//there is user logged & we opened login -- goto main form
 				if(reqhlp.getRequestURL().contains(getLoginPage(AUTHENTICATION_TYPE.USERPASS))){
-					userNav.navPage = MAIN_FORM_PAGE;
+					userNav.navPage = tokenAuthenticationConfiguration.getMainFormPage();
 				}
 				userNav.setLogged(true);
 			}
@@ -203,8 +191,7 @@ public class AppAuthenticationUtils {
 		String thisSessionId = sessionData.getSessionId(); l.log("Token Id is " + tokenId + ", This session id is " + thisSessionId);
 		String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
 		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...  Use Other token or log out & log in again..");
-	}
-	
+	}	
 
 	private static class AuthenticationLogger{
 		private boolean verbose;

@@ -270,10 +270,9 @@ public class AuthenticationUtils {
      */
     public static IAuthentication getTokenAuthentication(Map httpsesionParamMap,
     		Object httpServletRequest,
-			ITokenAuthneticationCallBacksFactory tokenCallBacks,
-			TokenAuthenticationParams tokenAuthenticationParams
+    		ITokenAuthenticationConfiguration tokenAuthenticationConfiguration
 			){
-    	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest, tokenCallBacks, tokenAuthenticationParams).getAuthentication();
+    	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,tokenAuthenticationConfiguration).getAuthentication();
     }
     
     

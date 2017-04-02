@@ -1,7 +1,6 @@
 package net.is_bg.ltfn.authenticate;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacksFactory;
@@ -47,11 +46,10 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	TokenAuthenticationFactory(
 			Map httpsessionParamMap,
 			Object httpServletRequest,
-			ITokenAuthneticationCallBacksFactory tokenAuthneticationCallBackFactory,
-			TokenAuthenticationParams tokenParams){
+			ITokenAuthenticationConfiguration tokenAuthenticationConfiguration){
 		tokenAuthentication = new TokenAuthenticationInner(httpServletRequest,
 				getTokenCredentials(httpsessionParamMap), 
-				tokenAuthneticationCallBackFactory, tokenParams);
+				tokenAuthenticationConfiguration);
 	}
 	
 	
@@ -220,17 +218,16 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	
 	
 	static class TokenAuthenticationInner extends TokenAuthentication<Boolean>{
-	    private ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
-		private TokenAuthenticationParams tokenParams;
+	    private ITokenAuthenticationConfiguration tokenAuthenticationConfiguration;
 		private Object httpservletRequest;
+		private ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
 		
 		public TokenAuthenticationInner(Object httpservletRequest, TokenCredentials tokenCredentials, 
-				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory,
-				TokenAuthenticationParams tokenParams) {
+				ITokenAuthenticationConfiguration tokenAuthenticationConfiguration) {
 			super(tokenCredentials);
 			this.httpservletRequest = httpservletRequest;
-			this.tokenAuthenticationCallBackFactory = tokenAuthenticationCallBackFactory;
-			this.tokenParams = tokenParams;
+			this.tokenAuthenticationConfiguration = tokenAuthenticationConfiguration;
+			tokenAuthenticationCallBackFactory = tokenAuthenticationConfiguration.getTokenAuthenticationCallBackFactory();
 		}
 		
 
@@ -238,7 +235,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		public Boolean authenticate() throws AuthenticationException {
 			// TODO Auto-generated method stub
 			//authenticate with token here 
-
+			
 			//get token id from request
 			String tokenId = getTokentCredentials().getToken().getTokenId();
 			
@@ -287,21 +284,21 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			}
 			
 			//get the ip that made the authentication request
-			String ipAddress = tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().getIpAddressCallBack().callBack(httpservletRequest);  
+			String ipAddress = tokenAuthenticationConfiguration.getTokenAuthenticationCallBackFactory().getITokenAuthneticationCallBacks().getIpAddressCallBack().callBack(httpservletRequest);  
 			
 			//ip do not match!!!
-			if(!tokenParams.isSupressIpCheck() && !tokenData.getRequestIp().equals(ipAddress)){
+			if(!tokenAuthenticationConfiguration.getTokenAuthenticationParams().isSupressIpCheck() && !tokenData.getRequestIp().equals(ipAddress)){
 				//System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 				throw new RuntimeException("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 			}
-			
-			tokenParams.getUserLogCallBackParam().add(httpservletRequest);
-			tokenParams.getUserLogCallBackParam().add(tokenId);
-			tokenParams.getUserLogCallBackParam().add(tdata.getUserKey());
-			tokenParams.getUserLogCallBackParam().add(tdata.getDefDbCon());
+		    TokenAuthenticationParams	tokenParams = tokenAuthenticationConfiguration.getTokenAuthenticationParams();
+		    tokenParams.getUserLogCallBackParam().add(httpservletRequest);
+		    tokenParams.getUserLogCallBackParam().add(tokenId);
+		    tokenParams.getUserLogCallBackParam().add(tdata.getUserKey());
+		    tokenParams.getUserLogCallBackParam().add(tdata.getDefDbCon());
 			
 			//log user
-			tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().userLogCallBack().callBack(tokenParams.getUserLogCallBackParam());
+			tokenAuthenticationConfiguration.getTokenAuthenticationCallBackFactory().getITokenAuthneticationCallBacks().userLogCallBack().callBack(tokenParams.getUserLogCallBackParam());
 			
 			return true;
 		}
