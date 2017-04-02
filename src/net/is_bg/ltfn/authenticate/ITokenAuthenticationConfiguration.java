@@ -137,7 +137,7 @@ public interface ITokenAuthenticationConfiguration {
 		@Override
 		public String getMainFormPage() {
 			// TODO Auto-generated method stub
-			return null;
+			return mainFormPage;
 		}
 	}
 }
