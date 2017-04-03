@@ -62,6 +62,7 @@ public class AppAuthenticationUtils {
 		HpptServletRequestAuthentication(Object httpServletRequest,
 				ITokenAuthenticationConfiguration tokenAuthenticationConfiguration){
 			this.httpServletRequest = httpServletRequest;
+			this.tokenAuthenticationConfiguration = tokenAuthenticationConfiguration;
 			
 		}
 
