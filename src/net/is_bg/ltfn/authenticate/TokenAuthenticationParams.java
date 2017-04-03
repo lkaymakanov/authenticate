@@ -41,4 +41,14 @@ public class TokenAuthenticationParams  {
 		this.verbose = verbose;
 	}
 	
+	public String getConfiguration(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("allowTokenAuthentication:" + allowTokenAuthentication); sb.append("\n");
+		sb.append("supressIpCheck:" + supressIpCheck); sb.append("\n");
+		sb.append("overWriteUser:" + overWriteUser); sb.append("\n");
+		sb.append("verbose:" + verbose);sb.append("\n");
+		String s = sb.toString();
+		return s; 
+	}
+	
 }

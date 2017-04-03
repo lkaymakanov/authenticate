@@ -16,6 +16,7 @@ public interface ITokenAuthenticationConfiguration {
 	IRequestHelperFactory getRequestHelperFactory(); 
 	ISessionDataFactory getSessionDataFactory();
 	TokenAuthenticationParams getTokenAuthenticationParams();
+	String getConfiguration();
 	
 	
 	public static class TokenAuthenticationConfigurationBuilder{
@@ -138,6 +139,21 @@ public interface ITokenAuthenticationConfiguration {
 		public String getMainFormPage() {
 			// TODO Auto-generated method stub
 			return mainFormPage;
+		}
+		
+		@Override
+		public String getConfiguration() {
+			
+			// TODO Auto-generated method stub
+			StringBuilder sb = new StringBuilder();
+			sb.append("loginPage:" + loginPage); sb.append("\n");
+			sb.append("mainFormPage:" + mainFormPage); sb.append("\n");
+			sb.append("tokenAuthenticationPrefix:" + tokenAuthenticationPrefix); sb.append("\n");
+			sb.append("tokenAuthenticationContext:" + tokenAuthenticationContext);sb.append("\n");
+			sb.append("=====Token AuthenticationParams=======\n" + tokenAuthenticationParams.getConfiguration()); sb.append("\n");
+			sb.append("=====Server Settings=====\n" + serverSettings.getConfiguration()); sb.append("\n");
+			String s = sb.toString();
+			return s;
 		}
 	}
 }

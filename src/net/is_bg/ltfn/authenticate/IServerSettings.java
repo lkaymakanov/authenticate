@@ -18,7 +18,7 @@ public interface IServerSettings {
 	public String toClientConfigurationName();
 	public boolean isSecure();
 	public String toEndPoint();
-	
+	String getConfiguration();
 	
 	public static class TokenServerSettingsBuilder{
 		
@@ -118,7 +118,7 @@ public interface IServerSettings {
 		private int readTimeOut = 600;
 		
 		
-		private ServerSettings(String ip, String port, String protocol,
+		ServerSettings(String ip, String port, String protocol,
 			    String context, String keystoreFile,
 				String keystorePass, String keyAlias, String keyPass,
 				String socketProtocol, String storeType, String application,
@@ -227,6 +227,27 @@ public interface IServerSettings {
 		 */
 		public String toEndPoint(){
 			return protocol+"://" + ip + ":" + port + "/" + context;
+		}
+		
+		@Override
+		public String getConfiguration() {
+			// TODO Auto-generated method stub
+			StringBuilder sb = new StringBuilder();
+			sb.append("ip:" + ip); sb.append("\n");
+			sb.append("port:" + port); sb.append("\n");
+			sb.append("protocol:" + protocol); sb.append("\n");
+			sb.append("secure:" + isSecure());sb.append("\n");
+			sb.append("context:" + context); sb.append("\n");
+			sb.append("keystoreFile:" + keystoreFile); sb.append("\n");
+			sb.append("keystorePass:" + keystorePass); sb.append("\n");
+			sb.append("keyAlias:" + keyAlias); sb.append("\n");
+			sb.append("keyPass:" + keyPass); sb.append("\n");
+			sb.append("socketProtocol:" + socketProtocol); sb.append("\n");
+			sb.append("storeType:" + storeType); sb.append("\n");
+			sb.append("application:" + application); sb.append("\n");
+			sb.append("readTimeOut:" + readTimeOut); sb.append("\n");
+			String s = sb.toString();
+			return s;
 		}
 		
 	}
