@@ -26,6 +26,7 @@ public class AppAuthenticationUtils {
 	@SuppressWarnings("unchecked")
 	private static IAuthentication<Boolean>  getTokenAuthenticator(Object httpServletRequest, Map requestParamMap, 
 			ITokenAuthenticationConfiguration tokenAuthenticationConfiguration){
+		if(tokenAuthenticationConfiguration.getTokenAuthenticationFactory() != null) return tokenAuthenticationConfiguration.getTokenAuthenticationFactory().getAuthentication();
 		return 		AuthenticationUtils.getTokenAuthentication(requestParamMap, 
 						httpServletRequest, tokenAuthenticationConfiguration);
 	}

@@ -1,5 +1,6 @@
 package net.is_bg.ltfn.authenticate;
 
+import authenticate.IAuthenticationFactory;
 import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.IRequestHelperFactory;
 import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.ISessionDataFactory;
 import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacksFactory;
@@ -12,6 +13,7 @@ public interface ITokenAuthenticationConfiguration {
 	String getTokenAuthenticationContext();
 	
 	IServerSettings getServerSettings();
+	IAuthenticationFactory getTokenAuthenticationFactory();
 	ITokenAuthneticationCallBacksFactory getTokenAuthenticationCallBackFactory();
 	IRequestHelperFactory getRequestHelperFactory(); 
 	ISessionDataFactory getSessionDataFactory();
@@ -26,7 +28,7 @@ public interface ITokenAuthenticationConfiguration {
 		IRequestHelperFactory requestHelperFactory;
 		ISessionDataFactory sessionDataFactory;
 		TokenAuthenticationParams tokenAuthenticationParams;
-		
+		IAuthenticationFactory tokenAuthenticationFactory;
 		public TokenAuthenticationConfigurationBuilder setLoginPage(String loginPage) {
 			this.loginPage = loginPage;
 			return this;
@@ -68,13 +70,18 @@ public interface ITokenAuthenticationConfiguration {
 			this.tokenAuthenticationParams = tokenAuthenticationParams;
 			return this;
 		}
+		
+		public TokenAuthenticationConfigurationBuilder setTokenAuthenticationFactory(IAuthenticationFactory tokenFactory){
+			this.tokenAuthenticationFactory = tokenFactory;
+			return this;
+		}
 
 		public ITokenAuthenticationConfiguration build(){
 			return new TokenAuthenticationConfiguration( loginPage,  mainFormPage,  emptyPage,
 					 tokenAuthenticationPrefix,  tokenAuthenticationContext,  serverSettings,
 					 tokenAuthenticationCallBackFactory,
 					 requestHelperFactory,  sessionDataFactory,
-					 tokenAuthenticationParams);
+					 tokenAuthenticationParams, tokenAuthenticationFactory);
 		}
 	}
 	
@@ -86,14 +93,14 @@ public interface ITokenAuthenticationConfiguration {
 		IRequestHelperFactory requestHelperFactory;
 		ISessionDataFactory sessionDataFactory;
 		TokenAuthenticationParams tokenAuthenticationParams;
-		
+		IAuthenticationFactory tokenAuthenticationFactory;		
 		
 		
 		public TokenAuthenticationConfiguration(String loginPage, String mainFormPage, String emptyPage,
 				String tokenAuthenticationPrefix, String tokenAuthenticationContext, IServerSettings serverSettings,
 				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory,
 				IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
-				TokenAuthenticationParams tokenAuthenticationParams) {
+				TokenAuthenticationParams tokenAuthenticationParams, IAuthenticationFactory tokenAuthenticationFactory) {
 			super();
 			this.loginPage = loginPage;
 			this.mainFormPage = mainFormPage;
@@ -107,6 +114,13 @@ public interface ITokenAuthenticationConfiguration {
 			this.tokenAuthenticationParams = tokenAuthenticationParams;
 		}
 
+		
+		@Override
+		public IAuthenticationFactory getTokenAuthenticationFactory() {
+			// TODO Auto-generated method stub
+			return tokenAuthenticationFactory;
+		}
+		
 		public String getLoginPage() {
 			return loginPage;
 		}
