@@ -11,7 +11,17 @@ public class TokenAuthenticationParams  {
 
 	/**Allows token authentication if true*/
 	private boolean allowTokenAuthentication;
-	/*** For now list of three output parameters  passed into user log function!!!*/
+	/***<pre> 
+	   For now list of four output parameters  passed into user log function!!!
+	   Must be initialized to an empty Object list!!!
+	   Output parameters are:
+	   <b>
+	    	httpservletRequest
+			tokenId 
+			userKey
+			connectionName
+		</b>
+		</pre>*/
 	private List<Object> userLogCallBackParam;
 	/**If true doesn't take into account the ip address of the incoming request!!!*/
 	private boolean supressIpCheck;
@@ -28,9 +38,32 @@ public class TokenAuthenticationParams  {
 	public void setAllowTokenAuthentication(boolean allowTokenAuthentication) {
 		this.allowTokenAuthentication = allowTokenAuthentication;
 	}
+	/***<pre> 
+	   For now list of four output parameters  passed into user log function!!!
+	   Must be initialized to an empty Object list!!!
+	   Output parameters are:
+	   <b>
+	    	httpservletRequest
+			tokenId 
+			userKey
+			connectionName
+		</b>
+		</pre>*/
 	public List<Object> getUserLogCallBackParam() {
 		return userLogCallBackParam;
 	}
+	/***
+	  <pre> 
+	   For now list of four output parameters  passed into user log function!!!
+	   Must be initialized to an empty Object list!!!
+	   Output parameters are:
+	   <b>
+	    	httpservletRequest
+			tokenId 
+			userKey
+			connectionName
+		</b>
+		</pre>*/
 	public void setUserLogCallBackParam(List<Object> userLogCallBackParam) {
 		this.userLogCallBackParam = userLogCallBackParam;
 	}

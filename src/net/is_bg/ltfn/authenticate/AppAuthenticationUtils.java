@@ -2,10 +2,8 @@ package net.is_bg.ltfn.authenticate;
 
 import java.io.IOException;
 import java.util.Map;
-
 import net.is_bg.ltfn.authenticate.AuthenticationUtils;
 import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacks;
-import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacksFactory;
 import net.is_bg.ltfn.authenticate.InvalidTokenException;
 import net.is_bg.ltfn.authenticate.NoTokenException;
 import net.is_bg.ltfn.authenticate.TokenAuthenticationParams;
@@ -21,11 +19,8 @@ import authenticate.IAuthentication;
  */
 public class AppAuthenticationUtils {
 	
-
-	
-	
 	/***
-	 * Gets a user token based authentication scheme!!!
+	 * Gets token based authentication scheme!!!
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -50,7 +45,12 @@ public class AppAuthenticationUtils {
 	
 	
 	
-	
+	/***
+	 * Use request data & session data associated with this request to be analyzed if user is logged & to log user
+	 * if valid token is present in the request!!!!
+	 * @author lubo
+	 *
+	 */
 	private static class HpptServletRequestAuthentication {
 		
 		
@@ -78,7 +78,7 @@ public class AppAuthenticationUtils {
 		
 		
 		/***
-		 * Authentication based on token!!!
+		 * Token based Authentication mehtod!!!
 		 * @param httpServletRequest
 		 * @return
 		 * @throws AuthenticationException
@@ -89,7 +89,9 @@ public class AppAuthenticationUtils {
 		}
 		
 		/**
-		 * Check if user is logged!
+		 * Check if user is logged! If user is not logged & valid token is present in request
+		 * user associated with this token is retrieved from token Authentication server
+		 * & user is being logged!!
 		 */
 		UserNavigationPage checkiflogged() throws IOException{
 			TokenAuthenticationParams tokenParams = tokenAuthenticationConfiguration.getTokenAuthenticationParams();
@@ -185,7 +187,13 @@ public class AppAuthenticationUtils {
 		}
 	}
 	
-	
+	/**
+	 * Check if token is already associated with other session in the current application that uses token 
+	 * Authentication scheme!!!
+	 * @param l
+	 * @param tokenId
+	 * @param sessionData
+	 */
 	private static void checkTokenSessionAssociation(AuthenticationLogger l, String tokenId, ISessionData sessionData){
 		if(tokenId == null || tokenId.equals(TokenConstants.IVALID_TOKEN_ID)) return;
 		@SuppressWarnings("unused")
@@ -194,6 +202,14 @@ public class AppAuthenticationUtils {
 		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...  Use Other token or log out & log in again..");
 	}	
 
+	/***
+	 * <pre>
+	 * Prints more detailed log about logging activity
+	 * if verbose argument is set to true!!!
+	 * </pre>
+	 * @author lubo
+	 *
+	 */
 	private static class AuthenticationLogger{
 		private boolean verbose;
 		
@@ -251,14 +267,16 @@ public class AppAuthenticationUtils {
 		public ISessionData getISessionData(Object httpServletRequest);
 	}
 	
-	
+	/***
+	 * Interface that contains user login in  functions!!!
+	 * @author lubo
+	 *
+	 */
 	public static interface ILogUser {
 		public  Object logUser(Object httpServletRequest,  String userKey, String tokenId, String dbIndex);
 		public  Object logUser(Object httpServletRequest,  Object user, String tokenId, String defDbConn);
 		
 	}
-	
-	
 	
 	public static interface ILogUserFactory {
 		public ILogUser getILogUser();

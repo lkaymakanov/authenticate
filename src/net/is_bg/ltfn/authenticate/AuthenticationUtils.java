@@ -113,16 +113,18 @@ public class AuthenticationUtils {
     	return tokenIdSessionIdMap.containsKey(tokenId);
     }
 
-    /**
+    
+    /***
      * Gets a user password based authentication!!!
-     * @param user
-     * @param pass
-     * @param dbConnName
+     * @param user userName
+     * @param pass password
+     * @param callBack method invoked on authentication
+     * @param callBackParam parameter passed to callcback invoked on authentication
      * @return
      */
-    public static IAuthentication getUserPassAuthenticator(String user,
+    public static IAuthentication getUserPassAuthenticator(String userName,
 									 String pass, IAuthenticationCallBack callBack, Object callBackParam) {
-    	return new UserPassAuthenticationFactory(user, pass, callBack, callBackParam).getAuthentication();
+    	return new UserPassAuthenticationFactory(userName, pass, callBack, callBackParam).getAuthentication();
     }
 
     /***
@@ -150,6 +152,15 @@ public class AuthenticationUtils {
      */
     public static String getConnectionNameFromTokenDataUserData(TokenDataUserData sdata){
     	return (sdata).getDefDbCon();
+    }
+    
+    /***
+     * Extracts ITokenData from TokenDataUserDataFromServer
+     * @param sdata
+     * @return
+     */
+    public static ITokenData getTokenFromTokenDataUserDataFromServer(Object sdata){
+    	return ((TokenDataUserDataFromServer)sdata).getTokenData();
     }
     
     /***
@@ -215,7 +226,7 @@ public class AuthenticationUtils {
     }
     
     /***
-     * Creates token encrypted token data  that contains the following
+     * Creates token encrypted  data  that contains the following
      *  </br>- ip address of the request that created this token
      *  </br>- the session id associated with this token
      *  </br>- token id
@@ -225,13 +236,13 @@ public class AuthenticationUtils {
      * @param sessionId
      * @param userId
      * @param userKey
-     * @param callBack a callback & callback param that resolves encryption key
-     * @param callBackParam a callback & callback param that resolves encryption key
+     * @param callBack a callback  that resolves encryption key
+     * @param callBackParam parameter passed to callback encryption key resolve method!!!
      * @return
      * @throws Exception
      */
     public static  ITokenData<byte[]> createTokenData(ClassLoader cl, String ipAddress, String sessionId, long userId, 
-    					  String userKey, IAuthenticationCallBack<String, String> callBack, String callBackParam
+    					  String userKey, String encoderFactoryName, IAuthenticationCallBack<String, String> getEncryptionKeycallBack, String callBackParam
 						 )
 	    throws Exception {
 
@@ -251,21 +262,19 @@ public class AuthenticationUtils {
 		tokenDataBuilder.setTokenId(sessionId);
 		tokenDataBuilder.setTokenSessionId(sessionId);
 		tokenDataBuilder.setUserId(userKey);
-		String userEncryptionKey = callBack.callBack(callBackParam);
-		byte[] data = AuthenticationEncryptionUtils.getEncoderFactory(cl, userEncryptionKey)
+		String userEncryptionKey = getEncryptionKeycallBack.callBack(callBackParam);
+		byte[] data = AuthenticationEncryptionUtils.getEncoderFactory(cl, userEncryptionKey, encoderFactoryName)
 							   .getEncoder()
 							   .encode(TokenUtils.serialize(tdata));
 		tokenDataBuilder.setAdditionalData(data);
 		return tokenDataBuilder.build();
     }
     
-    /***
-     * Get Token authentication 
-     * @param httpsesionParamMap
-     * @param getTokenDataCallBack
-     * @param getIpAddressCallBack
-     * @param autenticationCallBack
-     * @param checkifUserLoggedCallBack
+    /**
+     * Get Token authentication  based on incoming httpservlet request & tokenAuthenticationConfiguration!
+     * @param httpsesionParamMap incoming request
+     * @param httpServletRequest
+     * @param tokenAuthenticationConfiguration
      * @return
      */
     public static IAuthentication getTokenAuthentication(Map httpsesionParamMap,
@@ -275,12 +284,19 @@ public class AuthenticationUtils {
     	return new TokenAuthenticationFactory(httpsesionParamMap, httpServletRequest,tokenAuthenticationConfiguration).getAuthentication();
     }
     
-    
+    /**
+     * Interface that contains the callbacks used on the different steps of
+     * token auhtentication!!!
+     * @author lubo
+     *
+     */
     public interface ITokenAuthneticationCallBacks {
-		  IAuthenticationCallBack<ITokenData, Object> getTokenDataCallBack();
+    	  
+    	  /***/
+		  IAuthenticationCallBack<ITokenData, Object> decryptTokenDataCallBack();
+		  /***/
 		  IAuthenticationCallBack<String, Object> getIpAddressCallBack();
-		  IAuthenticationCallBack<Object, String> autenticationCallBack();
-		  IAuthenticationCallBack<Boolean, Object> checkifUserLoggedCallBack();
+		  IAuthenticationCallBack<Object, String> getTokenDataFromServerCallBack();
 		  IAuthenticationCallBack<Object, List<Object>> userLogCallBack();
 		  IAuthenticationCallBack<Boolean, String> isTokenValidCallBack();
 	}

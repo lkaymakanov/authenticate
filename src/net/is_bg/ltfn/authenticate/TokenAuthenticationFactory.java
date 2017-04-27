@@ -34,8 +34,8 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	}
 	
 	/***
-	 * Get token from request!!!
-	 * @return
+	 * Get tokenId  from request & returns TokenCredentials filled with the token Id!!!
+	 * @return 
 	 */
 	static TokenCredentials getTokenCredentials(Map httpsesionParamMap){
 		String tokenId = getRequestParam(httpsesionParamMap, TokenConstants.TOKEN_ID_PARAM_NAME) == null ? TokenConstants.IVALID_TOKEN_ID : 
@@ -43,6 +43,12 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		return new TokenCredentials(new Token(tokenId));
 	}
 	
+	/***
+	 * Returns a token authentication factory!!!
+	 * @param httpsessionParamMap
+	 * @param httpServletRequest
+	 * @param tokenAuthenticationConfiguration
+	 */
 	TokenAuthenticationFactory(
 			Map httpsessionParamMap,
 			Object httpServletRequest,
@@ -60,6 +66,11 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		return tokenAuthentication;
 	}
 	
+	/***
+	 * Token credentials containing just token Id!!!
+	 * @author lubo
+	 *
+	 */
 	static class Token implements IToken{
 		/**
 		 * 
@@ -83,7 +94,11 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 		
 	}
 	
-	
+	/**
+	 * The structure of the data returned by token authentication server!!!
+	 * @author lubo
+	 *
+	 */
 	static class ServerData {
 		private TokenDataWrapper tokenData;
 		private String userKey;
@@ -194,7 +209,7 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 
 	
 	/**
-	 * 
+	 * Retrieves token Data from AuthenticationServer!!!
 	 * @param dSettings
 	 * @return
 	 * @throws Exception
@@ -205,14 +220,14 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 	
 	
 	/**
-	 * Check if token is valid!!!
+	 * Check if token is valid in the authentication server!!!
 	 * @param autenticationCallBack
 	 * @param tokenId
 	 * @return
 	 * @throws Exception
 	 */
-	static boolean isTokenValid(IAuthenticationCallBack<Boolean, String> autenticationCallBack, String tokenId) throws Exception{
-		return autenticationCallBack.callBack(tokenId);
+	static boolean isTokenValid(IAuthenticationCallBack<Boolean, String> isTokenValidCallBack, String tokenId) throws Exception{
+		return isTokenValidCallBack.callBack(tokenId);
 	}
 	
 	
@@ -244,14 +259,11 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 				throw new RuntimeException("Token data is null...");
 			}*/
 			
-			//check if user is logged
+			/*//check if user is logged
 			if(tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().checkifUserLoggedCallBack().callBack(httpservletRequest)){
 				return true;
 			}
-			
-			
-			//no visit
-			
+			*/
 			//no token in request
 			if(tokenId == null){
 				throw new NoTokenException();
@@ -266,12 +278,11 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			TokenDataUserData tdata = null;
 			ITokenData tokenData = null;
 			try {
-				
 				//get token data from server
-				tdata = getTokenDataFromAuthenticationServer(tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().autenticationCallBack(), tokenId);
+				tdata = getTokenDataFromAuthenticationServer(tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().getTokenDataFromServerCallBack(), tokenId);
 				
 				//decrypt & analyze token data from server
-				tokenData = tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().getTokenDataCallBack().callBack(tdata);
+				tokenData = tokenAuthenticationCallBackFactory.getITokenAuthneticationCallBacks().decryptTokenDataCallBack().callBack(tdata);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -288,7 +299,6 @@ class TokenAuthenticationFactory implements IAuthenticationFactory<Boolean> {
 			
 			//ip do not match!!!
 			if(!tokenAuthenticationConfiguration.getTokenAuthenticationParams().isSupressIpCheck() && !tokenData.getRequestIp().equals(ipAddress)){
-				//System.out.println("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 				throw new RuntimeException("Token Ip = " + tokenData.getRequestIp() + " request Ip =  " +ipAddress);
 			}
 		    TokenAuthenticationParams	tokenParams = tokenAuthenticationConfiguration.getTokenAuthenticationParams();

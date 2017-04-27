@@ -27,7 +27,7 @@ class UserPassAuthenticationFactory implements IAuthenticationFactory {
 	return up;
     }
 
-    static class UserPassAuthenticationInner extends UserPassAuthentication {
+    private static class UserPassAuthenticationInner extends UserPassAuthentication {
 
 	private IAuthenticationCallBack callBack;
 	private Object authenticationCallBackParam;
