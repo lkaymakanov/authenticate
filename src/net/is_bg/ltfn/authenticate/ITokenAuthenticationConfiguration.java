@@ -112,6 +112,7 @@ public interface ITokenAuthenticationConfiguration {
 			this.requestHelperFactory = requestHelperFactory;
 			this.sessionDataFactory = sessionDataFactory;
 			this.tokenAuthenticationParams = tokenAuthenticationParams;
+			this.tokenAuthenticationFactory = tokenAuthenticationFactory;
 		}
 
 		
