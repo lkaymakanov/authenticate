@@ -109,8 +109,8 @@ public class AppAuthenticationUtils {
 			if(u == null){
 				l.log("No user is logged..");
 				//user is not logged and page is not login page - navigate to login page!!!!
-				if(!reqhlp.getRequestURL().contains(getLoginPage(AUTHENTICATION_TYPE.USERPASS))){
-					userNav.navPage = getLoginPage(AUTHENTICATION_TYPE.USERPASS);
+				if(!reqhlp.getRequestURL().contains(tokenAuthenticationConfiguration.getLoginPage())){
+					userNav.navPage = tokenAuthenticationConfiguration.getLoginPage();//getLoginPage(AUTHENTICATION_TYPE.USERPASS);
 				}
 			}else {
 				boolean isTokenLogin = sessionData.getTokenId() != null;
