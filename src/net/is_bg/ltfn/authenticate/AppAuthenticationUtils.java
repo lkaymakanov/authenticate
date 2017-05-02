@@ -2,11 +2,13 @@ package net.is_bg.ltfn.authenticate;
 
 import java.io.IOException;
 import java.util.Map;
+
 import net.is_bg.ltfn.authenticate.AuthenticationUtils;
 import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacks;
 import net.is_bg.ltfn.authenticate.InvalidTokenException;
 import net.is_bg.ltfn.authenticate.NoTokenException;
 import net.is_bg.ltfn.authenticate.TokenAuthenticationParams;
+import token.ITokenData;
 import token.TokenConstants;
 import token.TokenConstants.AUTHENTICATION_TYPE;
 import authenticate.AuthenticationException;
@@ -126,8 +128,11 @@ public class AppAuthenticationUtils {
 					}//;//throw new RuntimeException("This session is associated with token & no token is found in request...");
 					else if(!callBacks.isTokenValidCallBack().callBack(tokenId)) throw new RuntimeException("Invalid token in request...");
 					else{
+						ITokenData  tokenData = callBacks.decryptTokenDataCallBack().callBack(tokenId);
+						l.log("token data is " + tokenData == null ? "null"  : tokenData.toString());
+						
 						//check if token is associated with different sessionId
-						checkTokenSessionAssociation(l, tokenId, sessionData);
+						checkTokenSessionAssociation(l, tokenData.getTokenSessionId(), sessionData);
 						
 						//valid token in request 
 						if(!tokenId.equals(sessionData.getTokenId())){
@@ -158,7 +163,9 @@ public class AppAuthenticationUtils {
 			//try token login if token login is supported & user is not logged in
 			boolean ta = tokenParams.isAllowTokenAuthentication();
 			if(ta && !userNav.isLogged()  ){
-				checkTokenSessionAssociation(l,  AuthenticationUtils.getTokenFromRequestMap(reqhlp.getParameterMap()), sessionData);
+				ITokenData  tokenData = callBacks.decryptTokenDataCallBack().callBack(AuthenticationUtils.getTokenFromRequestMap(reqhlp.getParameterMap()));
+				l.log("token data is " + tokenData == null ? "null"  : tokenData.toString());
+				checkTokenSessionAssociation(l,  tokenData.getTokenSessionId(), sessionData);
 				try {
 					if(tokenAuthentication(httpServletRequest, reqhlp.getParameterMap())){
 						userNav.setLogged(true);
@@ -195,11 +202,11 @@ public class AppAuthenticationUtils {
 	 * @param tokenId
 	 * @param sessionData
 	 */
-	private static void checkTokenSessionAssociation(AuthenticationLogger l, String tokenId, ISessionData sessionData){
-		if(tokenId == null || tokenId.equals(TokenConstants.IVALID_TOKEN_ID)) return;
+	private static void checkTokenSessionAssociation(AuthenticationLogger l, String tokenSessionId, ISessionData sessionData){
+		if(tokenSessionId == null || tokenSessionId.equals(TokenConstants.IVALID_TOKEN_ID)) return;
 		@SuppressWarnings("unused")
-		String thisSessionId = sessionData.getSessionId(); l.log("Token Id is " + tokenId + ", This session id is " + thisSessionId);
-		String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
+		String thisSessionId = sessionData.getSessionId(); l.log("Session Id that created token  is " + tokenSessionId + ", This session id is " + thisSessionId);
+		String sessionAssociatedWithToken = AuthenticationUtils.getSessionAssociatedWithToken(tokenSessionId);  l.log("Session associated with this token is " + sessionAssociatedWithToken);
 		if(sessionAssociatedWithToken != null && !thisSessionId.equals(sessionAssociatedWithToken))  throw new RuntimeException("Token is already associated with other session id...  Use Other token or log out & log in again..");
 	}	
 
