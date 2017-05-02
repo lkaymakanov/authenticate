@@ -1,6 +1,7 @@
 package net.is_bg.ltfn.authenticate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import net.is_bg.ltfn.authenticate.AuthenticationUtils;
@@ -91,6 +92,15 @@ public class AppAuthenticationUtils {
 					tokenAuthenticationConfiguration).authenticate();
 		}
 		
+		
+		private boolean isLoginPage(String url){
+			List<String> lpages =  tokenAuthenticationConfiguration.getLoginPages();
+			for(String lPage : lpages){
+				if(url.contains(lPage)) return true;
+			}
+			return false;
+		}
+		
 		/**
 		 * Check if user is logged! If user is not logged & valid token is present in request
 		 * user associated with this token is retrieved from token Authentication server
@@ -104,13 +114,16 @@ public class AppAuthenticationUtils {
 			Object u = sessionData.getUser();
 			UserNavigationPage userNav = new UserNavigationPage();
 			AuthenticationLogger l =  new AuthenticationLogger(tokenParams.isVerbose());
-			
+			String loginPage = tokenAuthenticationConfiguration.getLoginPage();
+			String mainFormPage  = tokenAuthenticationConfiguration.getMainFormPage();
 			userNav.user = u;
+			userNav.navPage = null;
+			l.log("========== REQUEST URL IS ====" + reqhlp.getRequestURL());
 			if(u == null){
 				l.log("No user is logged..");
 				//user is not logged and page is not login page - navigate to login page!!!!
-				if(!reqhlp.getRequestURL().contains(tokenAuthenticationConfiguration.getLoginPage())){
-					userNav.navPage = tokenAuthenticationConfiguration.getLoginPage();//getLoginPage(AUTHENTICATION_TYPE.USERPASS);
+				if(!isLoginPage(reqhlp.getRequestURL())){
+					userNav.navPage = loginPage;//getLoginPage(AUTHENTICATION_TYPE.USERPASS);
 				}
 			}else {
 				boolean isTokenLogin = sessionData.getTokenId() != null;
@@ -154,8 +167,9 @@ public class AppAuthenticationUtils {
 				
 				//no token login 
 				//there is user logged & we opened login -- goto main form
-				if(reqhlp.getRequestURL().contains(getLoginPage(AUTHENTICATION_TYPE.USERPASS))){
-					userNav.navPage = tokenAuthenticationConfiguration.getMainFormPage();
+				if(isLoginPage(reqhlp.getRequestURL())){
+					l.log("Navigating to " + mainFormPage);
+					userNav.navPage = mainFormPage;
 				}
 				userNav.setLogged(true);
 			}

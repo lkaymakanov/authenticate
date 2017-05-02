@@ -1,5 +1,8 @@
 package net.is_bg.ltfn.authenticate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import authenticate.IAuthenticationFactory;
 import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.IRequestHelperFactory;
 import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.ISessionDataFactory;
@@ -7,6 +10,7 @@ import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallB
 
 public interface ITokenAuthenticationConfiguration {
 	String getLoginPage();
+	List<String> getLoginPages();
 	String getMainFormPage();
 	String getEmptyPage();
 	String getTokenAuthenticationPrefix();
@@ -24,6 +28,7 @@ public interface ITokenAuthenticationConfiguration {
 	public static class TokenAuthenticationConfigurationBuilder{
 		String loginPage, mainFormPage, emptyPage, tokenAuthenticationPrefix, tokenAuthenticationContext;
 		IServerSettings serverSettings;
+		List<String> loginPages;
 		ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
 		IRequestHelperFactory requestHelperFactory;
 		ISessionDataFactory sessionDataFactory;
@@ -75,12 +80,17 @@ public interface ITokenAuthenticationConfiguration {
 			this.tokenAuthenticationFactory = tokenFactory;
 			return this;
 		}
+		
 
+		public TokenAuthenticationConfigurationBuilder setLoginPages(List<String> loginPages) {
+			this.loginPages = loginPages;
+			return this;
+		}
 		public ITokenAuthenticationConfiguration build(){
 			return new TokenAuthenticationConfiguration( loginPage,  mainFormPage,  emptyPage,
 					 tokenAuthenticationPrefix,  tokenAuthenticationContext,  serverSettings,
 					 tokenAuthenticationCallBackFactory,
-					 requestHelperFactory,  sessionDataFactory,
+					 requestHelperFactory,  sessionDataFactory, loginPages,
 					 tokenAuthenticationParams, tokenAuthenticationFactory);
 		}
 	}
@@ -88,6 +98,7 @@ public interface ITokenAuthenticationConfiguration {
 	
 	static class TokenAuthenticationConfiguration implements ITokenAuthenticationConfiguration{
 		String loginPage, mainFormPage, emptyPage, tokenAuthenticationPrefix, tokenAuthenticationContext;
+		List<String> loginPages = new ArrayList<String>();
 		IServerSettings serverSettings;
 		ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
 		IRequestHelperFactory requestHelperFactory;
@@ -100,6 +111,7 @@ public interface ITokenAuthenticationConfiguration {
 				String tokenAuthenticationPrefix, String tokenAuthenticationContext, IServerSettings serverSettings,
 				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory,
 				IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
+				List<String> loginPages,
 				TokenAuthenticationParams tokenAuthenticationParams, IAuthenticationFactory tokenAuthenticationFactory) {
 			super();
 			this.loginPage = loginPage;
@@ -113,6 +125,8 @@ public interface ITokenAuthenticationConfiguration {
 			this.sessionDataFactory = sessionDataFactory;
 			this.tokenAuthenticationParams = tokenAuthenticationParams;
 			this.tokenAuthenticationFactory = tokenAuthenticationFactory;
+			this.loginPages = loginPages;
+			
 		}
 
 		
@@ -152,14 +166,16 @@ public interface ITokenAuthenticationConfiguration {
 		}
 		@Override
 		public String getMainFormPage() {
-			// TODO Auto-generated method stub
 			return mainFormPage;
 		}
 		
 		@Override
+		public List<String> getLoginPages() {
+			return loginPages;
+		}
+		
+		@Override
 		public String getConfiguration() {
-			
-			// TODO Auto-generated method stub
 			StringBuilder sb = new StringBuilder();
 			sb.append("loginPage:" + loginPage); sb.append("\n");
 			sb.append("mainFormPage:" + mainFormPage); sb.append("\n");
@@ -170,5 +186,8 @@ public interface ITokenAuthenticationConfiguration {
 			String s = sb.toString();
 			return s;
 		}
+
+
+		
 	}
 }
