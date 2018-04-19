@@ -1,4 +1,4 @@
-package net.is_bg.ltfn.authenticate;
+package authenticate.token;
 
 /**
  * Interface that gets access to logged user!!

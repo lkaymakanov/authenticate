@@ -1,10 +1,10 @@
-package authenticate;
+package authenticate.token;
 
 /**
  * Authentication exception thrown on unsuccessful authentication !!!
  * @author lubo
  */
-public class AuthenticationException extends Exception {
+public class TokenAuthenticationException extends Exception {
 	/**
 	 * 
 	 */
@@ -12,12 +12,12 @@ public class AuthenticationException extends Exception {
 	private Object data;
 	
 	
-	private AuthenticationException(String message, Throwable t, Object data){
+	private TokenAuthenticationException(String message, Throwable t, Object data){
 		super(message, t);
 		this.data = data;
 	}
 	
-	private AuthenticationException(String message, Object data){
+	private TokenAuthenticationException(String message, Object data){
 		super(message);
 		this.data = data;
 	}
@@ -48,8 +48,8 @@ public class AuthenticationException extends Exception {
 			return this;
 		}
 		
-		public AuthenticationException build(){
-			return t == null  ? new AuthenticationException(message, data) : new AuthenticationException(message, t, data); 
+		public TokenAuthenticationException build(){
+			return t == null  ? new TokenAuthenticationException(message, data) : new TokenAuthenticationException(message, t, data); 
 		}
 	}
 	

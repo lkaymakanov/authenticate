@@ -1,22 +1,18 @@
-package net.is_bg.ltfn.authenticate;
+package authenticate.token;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import authenticate.IAuthenticationFactory;
-import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.IRequestHelperFactory;
-import net.is_bg.ltfn.authenticate.AppAuthenticationUtils.ISessionDataFactory;
-import net.is_bg.ltfn.authenticate.AuthenticationUtils.ITokenAuthneticationCallBacksFactory;
-
 public interface ITokenAuthenticationConfiguration {
 	String getLoginPage();
 	List<String> getLoginPages();
+	List<String> getFreePages();
 	String getMainFormPage();
 	String getEmptyPage();
 	String getTokenAuthenticationPrefix();
 	String getTokenAuthenticationContext();
 	
-	IServerSettings getServerSettings();
+	//IServerSettings getServerSettings();
 	IAuthenticationFactory getTokenAuthenticationFactory();
 	ITokenAuthneticationCallBacksFactory getTokenAuthenticationCallBackFactory();
 	IRequestHelperFactory getRequestHelperFactory(); 
@@ -27,15 +23,16 @@ public interface ITokenAuthenticationConfiguration {
 	
 	public static class TokenAuthenticationConfigurationBuilder{
 		String loginPage, mainFormPage, emptyPage, tokenAuthenticationPrefix, tokenAuthenticationContext;
-		IServerSettings serverSettings;
+		//IServerSettings serverSettings;
 		List<String> loginPages;
+		List<String> freePages;
 		ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
 		IRequestHelperFactory requestHelperFactory;
 		ISessionDataFactory sessionDataFactory;
 		TokenAuthenticationParams tokenAuthenticationParams;
 		IAuthenticationFactory tokenAuthenticationFactory;
-		public TokenAuthenticationConfigurationBuilder setLoginPage(String loginPage) {
-			this.loginPage = loginPage;
+		public TokenAuthenticationConfigurationBuilder setFreePages(List<String> freePages) {
+			this.freePages = freePages;
 			return this;
 		}
 		public TokenAuthenticationConfigurationBuilder setMainFormPage(String mainFormPage) {
@@ -54,10 +51,10 @@ public interface ITokenAuthenticationConfiguration {
 			this.tokenAuthenticationContext = tokenAuthenticationContext;
 			return this;
 		}
-		public TokenAuthenticationConfigurationBuilder setServerSettings(IServerSettings serverSettings) {
+		/*public TokenAuthenticationConfigurationBuilder setServerSettings(IServerSettings serverSettings) {
 			this.serverSettings = serverSettings;
 			return this;
-		}
+		}*/
 		public TokenAuthenticationConfigurationBuilder setTokenAuthenticationCallBackFactory(
 				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory) {
 			this.tokenAuthenticationCallBackFactory = tokenAuthenticationCallBackFactory;
@@ -86,32 +83,39 @@ public interface ITokenAuthenticationConfiguration {
 			this.loginPages = loginPages;
 			return this;
 		}
+		
+		public void setLoginPage(String loginPage) {
+			this.loginPage  = loginPage;
+		}
+		
 		public ITokenAuthenticationConfiguration build(){
 			return new TokenAuthenticationConfiguration( loginPage,  mainFormPage,  emptyPage,
-					 tokenAuthenticationPrefix,  tokenAuthenticationContext,  serverSettings,
+					 tokenAuthenticationPrefix,  tokenAuthenticationContext,  /*serverSettings,*/
 					 tokenAuthenticationCallBackFactory,
-					 requestHelperFactory,  sessionDataFactory, loginPages,
+					 requestHelperFactory,  sessionDataFactory, loginPages, freePages,
 					 tokenAuthenticationParams, tokenAuthenticationFactory);
 		}
+		
 	}
 	
 	
 	static class TokenAuthenticationConfiguration implements ITokenAuthenticationConfiguration{
 		String loginPage, mainFormPage, emptyPage, tokenAuthenticationPrefix, tokenAuthenticationContext;
 		List<String> loginPages = new ArrayList<String>();
-		IServerSettings serverSettings;
+		//IServerSettings serverSettings;
 		ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory;
 		IRequestHelperFactory requestHelperFactory;
 		ISessionDataFactory sessionDataFactory;
 		TokenAuthenticationParams tokenAuthenticationParams;
-		IAuthenticationFactory tokenAuthenticationFactory;		
+		IAuthenticationFactory tokenAuthenticationFactory;
+		List<String> freePages;		
 		
 		
-		public TokenAuthenticationConfiguration(String loginPage, String mainFormPage, String emptyPage,
-				String tokenAuthenticationPrefix, String tokenAuthenticationContext, IServerSettings serverSettings,
+		TokenAuthenticationConfiguration(String loginPage, String mainFormPage, String emptyPage,
+				String tokenAuthenticationPrefix, String tokenAuthenticationContext, /* IServerSettings serverSettings,*/
 				ITokenAuthneticationCallBacksFactory tokenAuthenticationCallBackFactory,
 				IRequestHelperFactory requestHelperFactory, ISessionDataFactory sessionDataFactory,
-				List<String> loginPages,
+				List<String> loginPages, List<String> freePages,
 				TokenAuthenticationParams tokenAuthenticationParams, IAuthenticationFactory tokenAuthenticationFactory) {
 			super();
 			this.loginPage = loginPage;
@@ -119,14 +123,14 @@ public interface ITokenAuthenticationConfiguration {
 			this.emptyPage = emptyPage;
 			this.tokenAuthenticationPrefix = tokenAuthenticationPrefix;
 			this.tokenAuthenticationContext = tokenAuthenticationContext;
-			this.serverSettings = serverSettings;
+			//this.serverSettings = serverSettings;
 			this.tokenAuthenticationCallBackFactory = tokenAuthenticationCallBackFactory;
 			this.requestHelperFactory = requestHelperFactory;
 			this.sessionDataFactory = sessionDataFactory;
 			this.tokenAuthenticationParams = tokenAuthenticationParams;
 			this.tokenAuthenticationFactory = tokenAuthenticationFactory;
 			this.loginPages = loginPages;
-			
+			this.freePages = freePages;
 		}
 
 		
@@ -149,9 +153,7 @@ public interface ITokenAuthenticationConfiguration {
 		public String getTokenAuthenticationContext() {
 			return tokenAuthenticationContext;
 		}
-		public IServerSettings getServerSettings() {
-			return serverSettings;
-		}
+		
 		public ITokenAuthneticationCallBacksFactory getTokenAuthenticationCallBackFactory() {
 			return tokenAuthenticationCallBackFactory;
 		}
@@ -175,6 +177,11 @@ public interface ITokenAuthenticationConfiguration {
 		}
 		
 		@Override
+		public List<String> getFreePages() {
+			return freePages;
+		}
+		
+		@Override
 		public String getConfiguration() {
 			StringBuilder sb = new StringBuilder();
 			sb.append("loginPage:" + loginPage); sb.append("\n");
@@ -182,12 +189,16 @@ public interface ITokenAuthenticationConfiguration {
 			sb.append("tokenAuthenticationPrefix:" + tokenAuthenticationPrefix); sb.append("\n");
 			sb.append("tokenAuthenticationContext:" + tokenAuthenticationContext);sb.append("\n");
 			sb.append("=====Token AuthenticationParams=======\n" + tokenAuthenticationParams.getConfiguration()); sb.append("\n");
-			sb.append("=====Server Settings=====\n" + serverSettings.getConfiguration()); sb.append("\n");
+			//sb.append("=====Server Settings=====\n" + serverSettings.getConfiguration()); sb.append("\n");
 			String s = sb.toString();
 			return s;
 		}
-
-
 		
 	}
+	
+
+
+
+	
+    
 }

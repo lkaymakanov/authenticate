@@ -1,12 +1,6 @@
-package token;
+package authenticate.token;
 
-/**
- * 
- * @author lubo
- *
- */
 public class TokenConstants {
-	
 	public static final String TOKEN_ID_PARAM_NAME = "tokenid";
 	public static final String TOKEN_SESSION_ID_PARAM_NAME = "tokensessionid";
 	public static final String USER_ID_PARAM_NAME = "uid";

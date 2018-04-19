@@ -1,4 +1,4 @@
-package net.is_bg.ltfn.authenticate;
+package authenticate.token;
 
 public interface IAuthenticationCallBack<OUT, IN> {
 	public OUT callBack(IN in);
